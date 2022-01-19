@@ -60,7 +60,7 @@ resource "azurerm_lb" "lb" {
   resource_group_name = "${azurerm_resource_group.rg.name}"
 
   frontend_ip_configuration {
-    name                 = "publicIPAddress"
+    name                 = "PublicIPAddress"
     public_ip_address_id = azurerm_public_ip.pip_lb.id
   }
 }
@@ -69,6 +69,28 @@ resource "azurerm_lb" "lb" {
 resource "azurerm_lb_backend_address_pool" "backendAddressPool" {
   loadbalancer_id     = azurerm_lb.lb.id
   name                = "BackEndAddressPool"
+}
+
+# Create a Load Balancer health probe
+resource "azurerm_lb_probe" "lbprobe" {
+  name                = "sshProbe"
+  resource_group_name = "${azurerm_resource_group.rg.name}"
+  loadbalancer_id     = "${azurerm_lb.lb.id}"
+  port                = "22"
+}
+
+resource "azurerm_lb_rule" "lb_rule" {
+  count                          = length(var.ports)  
+  resource_group_name            = "${azurerm_resource_group.rg.name}"
+  loadbalancer_id                = azurerm_lb.lb.id
+  name                           = "lbrule-${var.ports[count.index]}"
+  protocol                       = "Tcp"
+  frontend_port                  = "${var.ports[count.index]}"
+  backend_port                   = "${var.ports[count.index]}"
+  frontend_ip_configuration_name = "PublicIPAddress"
+  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.backendAddressPool.id]
+  probe_id                       = azurerm_lb_probe.lbprobe.id
+  depends_on                     = [azurerm_lb_probe.lbprobe]
 }
 
 #Create 2 FrontEnd NICs for the webservers in the web subnet
@@ -85,6 +107,13 @@ resource "azurerm_network_interface" "nic_webservers" {
   }
 }
 
+resource "azurerm_network_interface_backend_address_pool_association" "nic_2_backend" {
+  count                   = 2  
+  network_interface_id    = "${element(azurerm_network_interface.nic_webservers.*.id,count.index)}"
+  ip_configuration_name   = "IPConfiguration"
+  backend_address_pool_id = azurerm_lb_backend_address_pool.backendAddressPool.id
+}
+
 #Create an availability set with two fault/update domains, so each webserver is placed into its own domain
 resource "azurerm_availability_set" "avset" {
   name                          = "avset"
@@ -94,17 +123,17 @@ resource "azurerm_availability_set" "avset" {
   platform_update_domain_count  = 2
   managed                       = true
 }
- 
+
 resource "azurerm_virtual_machine" "web_servers" {
   count                 = 2
   name                  = "webserver-${count.index}"
   location              = "${azurerm_resource_group.rg.location}"
   availability_set_id   = azurerm_availability_set.avset.id
   resource_group_name   = "${azurerm_resource_group.rg.name}"
-  network_interface_ids = [element(azurerm_network_interface.nic_webservers.*.id, count.index)]
+  network_interface_ids = ["${element(azurerm_network_interface.nic_webservers.*.id, count.index)}"]
   vm_size               = "Standard_DS1_v2"
 
-  # Uncomment this line to delete the OS disk automatically when deleting the VM
+  # Delete the OS disk automatically when deleting the VM
   delete_os_disk_on_termination = true
 
   storage_image_reference {
@@ -132,16 +161,7 @@ resource "azurerm_virtual_machine" "web_servers" {
   }
 
   tags = {
-    environment = "uit-demo"
+    environment = "terraform-demo"
   }
 
-  provisioner "remote-exec" {
-    inline = [
-      "sudo apt-get -y update",
-      "sudo apt-get -y install nginx",
-      "sudo systemctl enable nginx.service",
-      "sudo service nginx start",
-    ]
-  }
 }
-
