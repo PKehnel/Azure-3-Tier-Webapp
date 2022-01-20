@@ -4,6 +4,6 @@ variable "env" { default = "rg-usecase3" }
 
 variable "ports" {
   type    = list(string)
-  default = ["22"]
+  default = ["22", "80"]
 }
 

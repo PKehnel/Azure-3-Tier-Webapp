@@ -1,3 +1,11 @@
+ # IaC module to deploy a 2-Tier IaaS infrastructure in Azure
+ # Tier 1: Web-Layer consisting of 2 Load Balanced Web Servers
+ # Tier 2: DB-Layer with a Postgres DB
+ #
+ # Note: The web-site is static so there will be no actual access
+ #       between the web-servers and the DB. It is used for demo
+ #       purposes only
+ 
  terraform {
 
   required_version = ">=0.12"
@@ -72,14 +80,15 @@ resource "azurerm_lb_backend_address_pool" "backendAddressPool" {
 }
 
 # Create a Load Balancer health probe
-resource "azurerm_lb_probe" "lbprobe" {
-  name                = "sshProbe"
+resource "azurerm_lb_probe" "lbprobes" {
+  count               = length(var.ports)
+  name                = "probe-port-${var.ports[count.index]}"
   resource_group_name = "${azurerm_resource_group.rg.name}"
   loadbalancer_id     = "${azurerm_lb.lb.id}"
-  port                = "22"
+  port                = "${var.ports[count.index]}"
 }
 
-resource "azurerm_lb_rule" "lb_rule" {
+resource "azurerm_lb_rule" "lb_rules" {
   count                          = length(var.ports)  
   resource_group_name            = "${azurerm_resource_group.rg.name}"
   loadbalancer_id                = azurerm_lb.lb.id
@@ -89,8 +98,7 @@ resource "azurerm_lb_rule" "lb_rule" {
   backend_port                   = "${var.ports[count.index]}"
   frontend_ip_configuration_name = "PublicIPAddress"
   backend_address_pool_ids       = [azurerm_lb_backend_address_pool.backendAddressPool.id]
-  probe_id                       = azurerm_lb_probe.lbprobe.id
-  depends_on                     = [azurerm_lb_probe.lbprobe]
+  probe_id                       = azurerm_lb_probe.lbprobes[count.index].id
 }
 
 #Create 2 FrontEnd NICs for the webservers in the web subnet
