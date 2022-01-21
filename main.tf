@@ -6,11 +6,7 @@
  #       communication between the web-servers and the DB. 
  #       It is used for demo purposes only
  
-# Bootstrapping Template File
-data "template_file" "nginx_vm_cloud_init" {
-  template = file("install-nginx.sh")
-}
-
+ 
  terraform {
 
   required_version = ">=0.12"
@@ -28,10 +24,24 @@ provider "azurerm" {
 
 }
 
+# Bootstrapping Template File
+data "template_file" "nginx_vm_cloud_init" {
+  template = file("install-nginx.sh")
+}
+
 #Create a resource group to hold all the resources
 resource "azurerm_resource_group" "rg" {
   name     = "${var.env}"
   location = "${var.azure_region}"
+}
+
+#Create a LogAnalytics Workspace
+resource "azurerm_log_analytics_workspace" "log_ws" {
+  name                = "log-ws-uc3"
+  location            = "${azurerm_resource_group.rg.location}"
+  resource_group_name = "${azurerm_resource_group.rg.name}"
+  sku                 = "PerGB2018"
+  retention_in_days   = 180
 }
 
 #Create the VNet
@@ -42,7 +52,15 @@ resource "azurerm_virtual_network" "vnet" {
   resource_group_name = "${azurerm_resource_group.rg.name}"
 }
 
-#Create the subnet that hold the web-servers
+#Create the subnet that holds the app-gateway
+resource "azurerm_subnet" "subnet_gw" {
+  name                 = "subnet-gw"
+  resource_group_name  = "${azurerm_resource_group.rg.name}"
+  virtual_network_name = "${azurerm_virtual_network.vnet.name}"
+  address_prefixes     = ["10.0.0.0/24"]
+}
+
+#Create the subnet that holds the web-servers
 resource "azurerm_subnet" "subnet_web" {
   name                 = "subnet-web"
   resource_group_name  = "${azurerm_resource_group.rg.name}"
@@ -50,7 +68,7 @@ resource "azurerm_subnet" "subnet_web" {
   address_prefixes     = ["10.0.1.0/24"]
 }
 
-#Create the subnet that hold the db-servers
+#Create the subnet that holds the db-servers
 resource "azurerm_subnet" "subnet_db" {
   name                 = "subnet-db"
   resource_group_name  = "${azurerm_resource_group.rg.name}"
@@ -58,52 +76,13 @@ resource "azurerm_subnet" "subnet_db" {
   address_prefixes     = ["10.0.2.0/24"]
 }
 
-#Create the PIP for the loadbalancer
-resource "azurerm_public_ip" "pip_lb" {
-  name                = "publicIPForLB"
+#Create the PIP for the application gateway
+resource "azurerm_public_ip" "pip_gw" {
+  name                = "publicIPForGW"
   location            = "${azurerm_resource_group.rg.location}"
   resource_group_name = "${azurerm_resource_group.rg.name}"
   allocation_method   = "Static"
-}
-
-#Create the the loadbalancer and assign it the IP from the previous step
-resource "azurerm_lb" "lb" {
-  name                = "loadBalancer"
-  location            = "${azurerm_resource_group.rg.location}"
-  resource_group_name = "${azurerm_resource_group.rg.name}"
-
-  frontend_ip_configuration {
-    name                 = "PublicIPAddress"
-    public_ip_address_id = azurerm_public_ip.pip_lb.id
-  }
-}
-
-#Create the backend pool for the LB that will hold the private IPs of the webservers 
-resource "azurerm_lb_backend_address_pool" "backendAddressPool" {
-  loadbalancer_id     = azurerm_lb.lb.id
-  name                = "BackEndAddressPool"
-}
-
-# Create a Load Balancer health probe
-resource "azurerm_lb_probe" "lbprobes" {
-  count               = length(var.ports)
-  name                = "probe-port-${var.ports[count.index]}"
-  resource_group_name = "${azurerm_resource_group.rg.name}"
-  loadbalancer_id     = "${azurerm_lb.lb.id}"
-  port                = "${var.ports[count.index]}"
-}
-
-resource "azurerm_lb_rule" "lb_rules" {
-  count                          = length(var.ports)  
-  resource_group_name            = "${azurerm_resource_group.rg.name}"
-  loadbalancer_id                = azurerm_lb.lb.id
-  name                           = "lbrule-${var.ports[count.index]}"
-  protocol                       = "Tcp"
-  frontend_port                  = "${var.ports[count.index]}"
-  backend_port                   = "${var.ports[count.index]}"
-  frontend_ip_configuration_name = "PublicIPAddress"
-  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.backendAddressPool.id]
-  probe_id                       = azurerm_lb_probe.lbprobes[count.index].id
+  sku                 = "Standard"
 }
 
 #Create 2 FrontEnd NICs for the webservers in the web subnet
@@ -120,11 +99,80 @@ resource "azurerm_network_interface" "nic_webservers" {
   }
 }
 
-resource "azurerm_network_interface_backend_address_pool_association" "nic_2_backend" {
-  count                   = 2  
-  network_interface_id    = "${element(azurerm_network_interface.nic_webservers.*.id,count.index)}"
+#Local definition of reused names for easier reference
+locals {
+  backend_address_pool_name      = "${azurerm_virtual_network.vnet.name}-beap"
+  frontend_port_name             = "${azurerm_virtual_network.vnet.name}-feport"
+  frontend_ip_configuration_name = "${azurerm_virtual_network.vnet.name}-feip"
+  http_setting_name              = "${azurerm_virtual_network.vnet.name}-be-htst"
+  listener_name                  = "${azurerm_virtual_network.vnet.name}-httplstn"
+  request_routing_rule_name      = "${azurerm_virtual_network.vnet.name}-rqrt"
+  redirect_configuration_name    = "${azurerm_virtual_network.vnet.name}-rdrcfg"
+}
+
+#Create the Application Gateway
+resource "azurerm_application_gateway" "appgw" {
+  name                = "AppGateway-UC3"
+  location            = "${azurerm_resource_group.rg.location}"
+  resource_group_name = "${azurerm_resource_group.rg.name}"
+
+
+  sku {
+    name     = "Standard_V2"
+    tier     = "Standard_V2"
+    capacity = 2
+  }
+
+  gateway_ip_configuration {
+    name      = "appgw-ip-configuration"
+    subnet_id = azurerm_subnet.subnet_gw.id
+  }
+
+  frontend_port {
+    name = local.frontend_port_name
+    port = 80
+  }
+
+  frontend_ip_configuration {
+    name                 = local.frontend_ip_configuration_name
+    public_ip_address_id = azurerm_public_ip.pip_gw.id
+  }
+
+  backend_address_pool {
+    name          = local.backend_address_pool_name
+  }
+
+  backend_http_settings {
+    name                  = local.http_setting_name
+    cookie_based_affinity = "Disabled"
+    #path                  = "/path1/"
+    port                  = 80
+    protocol              = "Http"
+    request_timeout       = 60
+  }
+
+  http_listener {
+    name                           = local.listener_name
+    frontend_ip_configuration_name = local.frontend_ip_configuration_name
+    frontend_port_name             = local.frontend_port_name
+    protocol                       = "Http"
+  }
+
+  request_routing_rule {
+    name                       = local.request_routing_rule_name
+    rule_type                  = "Basic"
+    http_listener_name         = local.listener_name
+    backend_address_pool_name  = local.backend_address_pool_name
+    backend_http_settings_name = local.http_setting_name
+  }
+}
+
+# binding happens here
+resource "azurerm_network_interface_application_gateway_backend_address_pool_association" "nic_2_gw_binding" {
+  count = 2
+  network_interface_id    = "${azurerm_network_interface.nic_webservers[count.index].id}"
   ip_configuration_name   = "IPConfiguration"
-  backend_address_pool_id = azurerm_lb_backend_address_pool.backendAddressPool.id
+  backend_address_pool_id = "${azurerm_application_gateway.appgw.backend_address_pool.0.id}"
 }
 
 #Create an availability set with two fault/update domains, so each webserver is placed into its own domain
@@ -175,7 +223,28 @@ resource "azurerm_virtual_machine" "web_servers" {
   }
 
   tags = {
-    environment = "terraform-demo"
+    environment = "uc3-demo"
   }
+}
 
+resource "azurerm_virtual_machine_extension" "vm_ext" {
+  count = 2
+  name                 = "OmsAgentForLinux"
+  virtual_machine_id   = azurerm_virtual_machine.web_servers[count.index].id
+  publisher            = "Microsoft.EnterpriseCloud.Monitoring"
+  type                 = "OmsAgentForLinux"
+  type_handler_version = "1.12"
+  auto_upgrade_minor_version = true
+
+  settings = <<SETTINGS
+    {
+        "workspaceId": "${azurerm_log_analytics_workspace.log_ws.workspace_id}"
+    }
+  SETTINGS
+
+  protected_settings = <<PROTECTEDSETTINGS
+    {
+        "workspaceKey": "${azurerm_log_analytics_workspace.log_ws.primary_shared_key}"
+    }
+  PROTECTEDSETTINGS
 }
