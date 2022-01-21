@@ -2,10 +2,15 @@
  # Tier 1: Web-Layer consisting of 2 Load Balanced Web Servers
  # Tier 2: DB-Layer with a Postgres DB
  #
- # Note: The web-site is static so there will be no actual access
- #       between the web-servers and the DB. It is used for demo
- #       purposes only
+ # Note: The web-site is static so there will be no actual app-db
+ #       communication between the web-servers and the DB. 
+ #       It is used for demo purposes only
  
+# Bootstrapping Template File
+data "template_file" "nginx_vm_cloud_init" {
+  template = file("install-nginx.sh")
+}
+
  terraform {
 
   required_version = ">=0.12"
@@ -162,6 +167,7 @@ resource "azurerm_virtual_machine" "web_servers" {
     computer_name  = "webserver-${count.index}"
     admin_username = "kyndryl"
     admin_password = "Password1234!"
+    custom_data    = base64encode(data.template_file.nginx_vm_cloud_init.rendered)
   }
 
   os_profile_linux_config {
