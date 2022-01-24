@@ -105,9 +105,151 @@ locals {
   frontend_port_name             = "${azurerm_virtual_network.vnet.name}-feport"
   frontend_ip_configuration_name = "${azurerm_virtual_network.vnet.name}-feip"
   http_setting_name              = "${azurerm_virtual_network.vnet.name}-be-htst"
-  listener_name                  = "${azurerm_virtual_network.vnet.name}-httplstn"
+  https_setting_name             = "${azurerm_virtual_network.vnet.name}-be-httpsst"
+  listener_name_http             = "${azurerm_virtual_network.vnet.name}-httplstn"
+  listener_name_https            = "${azurerm_virtual_network.vnet.name}-httpslstn"
   request_routing_rule_name      = "${azurerm_virtual_network.vnet.name}-rqrt"
   redirect_configuration_name    = "${azurerm_virtual_network.vnet.name}-rdrcfg"
+}
+
+# Create a user assigned identity that represents the gateway for access to the vault
+resource "azurerm_user_assigned_identity" "agw" {
+  location            = "${azurerm_resource_group.rg.location}"
+  resource_group_name = "${azurerm_resource_group.rg.name}"
+  name                = "agw-msi"
+}
+
+# -
+# - Key Vault Configuration Start
+# -
+
+data "azurerm_client_config" "current" {}
+
+resource "random_string" "random_name" {
+  length = 8
+  special = false
+}
+
+resource "azurerm_key_vault" "vault" {
+  name                       = "keyvault${random_string.random_name.result}"
+  location                   = "${azurerm_resource_group.rg.location}"
+  resource_group_name        = "${azurerm_resource_group.rg.name}"
+  tenant_id                  = data.azurerm_client_config.current.tenant_id
+  soft_delete_retention_days = 90
+  purge_protection_enabled   = false
+  sku_name                   = "standard"
+
+  # Allow access for Builder ID
+  access_policy {
+    tenant_id    = data.azurerm_client_config.current.tenant_id
+    object_id    = data.azurerm_client_config.current.object_id
+
+    certificate_permissions = ["create", "get", "list"]
+  }
+
+  # Allow access from the gateway to access the certificate
+  access_policy {
+    tenant_id    = data.azurerm_client_config.current.tenant_id
+    object_id    = azurerm_user_assigned_identity.agw.principal_id
+
+    certificate_permissions = ["get"]
+    secret_permissions = ["get"]
+  }
+
+  network_acls {
+      default_action = "Allow"
+      bypass         = "AzureServices"
+  }
+}
+
+# Create an access policy for the builder to create a certificate
+#resource "azurerm_key_vault_access_policy" "terraformer" {
+#  key_vault_id = azurerm_key_vault.vault.id
+#  tenant_id    = data.azurerm_client_config.current.tenant_id
+#  object_id    = data.azurerm_client_config.current.object_id
+
+#  certificate_permissions = [
+#    "create",
+#    "get",
+#    "list"
+#  ]
+#}
+
+# Create an access policy for the below created gateway to access the certificate
+#resource "azurerm_key_vault_access_policy" "agw" {
+#  key_vault_id = azurerm_key_vault.vault.id
+#  tenant_id    = data.azurerm_client_config.current.tenant_id
+#  object_id    = azurerm_user_assigned_identity.agw.principal_id
+
+#  certificate_permissions = [
+#    "get"
+#  ]
+
+#  secret_permissions = [
+#    "get"
+#  ]
+#}
+
+# Create a self signed certificate
+resource "azurerm_key_vault_certificate" "certificate" {
+  name         = "cert-${var.website}"
+  key_vault_id = azurerm_key_vault.vault.id
+
+  certificate_policy {
+    issuer_parameters {
+      name = "Self"
+    }
+
+    key_properties {
+      exportable = true
+      key_size   = 2048
+      key_type   = "RSA"
+      reuse_key  = true
+    }
+
+    lifetime_action {
+      action {
+        action_type = "AutoRenew"
+      }
+
+      trigger {
+        days_before_expiry = 30
+      }
+    }
+
+    secret_properties {
+      content_type = "application/x-pkcs12"
+    }
+
+    x509_certificate_properties {
+      # Server Authentication = 1.3.6.1.5.5.7.3.1
+      # Client Authentication = 1.3.6.1.5.5.7.3.2
+      extended_key_usage = ["1.3.6.1.5.5.7.3.1"]
+
+      key_usage = [
+        "cRLSign",
+        "dataEncipherment",
+        "digitalSignature",
+        "keyAgreement",
+        "keyCertSign",
+        "keyEncipherment",
+      ]
+
+      subject_alternative_names {
+        dns_names = ["${var.website}.azurewebsites.net"]
+      }
+
+      subject            = "CN=${var.website}.azurewebsites.net"
+      validity_in_months = 12
+    }
+  }
+}
+
+# Allows some time for the certificate to be created
+resource "time_sleep" "wait_60_seconds" {
+  depends_on = [azurerm_key_vault_certificate.certificate]
+
+  create_duration = "60s"
 }
 
 #Create the Application Gateway
@@ -123,14 +265,24 @@ resource "azurerm_application_gateway" "appgw" {
     capacity = 2
   }
 
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.agw.id]
+  }
+
   gateway_ip_configuration {
     name      = "appgw-ip-configuration"
     subnet_id = azurerm_subnet.subnet_gw.id
   }
 
   frontend_port {
-    name = local.frontend_port_name
+    name = "${local.frontend_port_name}-80"
     port = 80
+  }
+  
+  frontend_port {
+    name = "${local.frontend_port_name}-443"
+    port = 443
   }
 
   frontend_ip_configuration {
@@ -142,28 +294,65 @@ resource "azurerm_application_gateway" "appgw" {
     name          = local.backend_address_pool_name
   }
 
+  ssl_certificate {
+    name                = azurerm_key_vault_certificate.certificate.name
+    key_vault_secret_id = azurerm_key_vault_certificate.certificate.secret_id
+  }
+
   backend_http_settings {
     name                  = local.http_setting_name
     cookie_based_affinity = "Disabled"
-    #path                  = "/path1/"
     port                  = 80
     protocol              = "Http"
     request_timeout       = 60
   }
 
+  backend_http_settings {
+    name                  = local.https_setting_name
+    cookie_based_affinity = "Disabled"
+    port                  = 443
+    protocol              = "Https"
+    host_name             = "${var.website}.azurewebsites.net"
+    request_timeout       = 1
+  }
+
   http_listener {
-    name                           = local.listener_name
+    name                           = local.listener_name_http
     frontend_ip_configuration_name = local.frontend_ip_configuration_name
-    frontend_port_name             = local.frontend_port_name
+    frontend_port_name             = "${local.frontend_port_name}-80"
     protocol                       = "Http"
+  }
+
+  http_listener {
+    name                           = local.listener_name_https
+    frontend_ip_configuration_name = local.frontend_ip_configuration_name
+    frontend_port_name             = "${local.frontend_port_name}-443"
+    protocol                       = "Https"
+    ssl_certificate_name           = azurerm_key_vault_certificate.certificate.name
   }
 
   request_routing_rule {
     name                       = local.request_routing_rule_name
     rule_type                  = "Basic"
-    http_listener_name         = local.listener_name
+    http_listener_name         = local.listener_name_http
     backend_address_pool_name  = local.backend_address_pool_name
     backend_http_settings_name = local.http_setting_name
+  }
+
+  request_routing_rule {
+    name                       = "${local.request_routing_rule_name}-https"
+    rule_type                  = "Basic"
+    http_listener_name         = local.listener_name_https
+    backend_address_pool_name  = local.backend_address_pool_name
+    backend_http_settings_name = local.http_setting_name
+  }
+
+  redirect_configuration {
+    name                 = local.redirect_configuration_name
+    redirect_type        = "Permanent"
+    include_path         = true
+    include_query_string = true
+    target_listener_name = local.listener_name_https
   }
 }
 
