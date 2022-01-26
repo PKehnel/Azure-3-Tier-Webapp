@@ -26,4 +26,5 @@ module "VSI_Webserver" {
   azure_region = var.azure_region
   stage        = var.stage
   env          = var.env
+  depends_on = [ module.Vnet, ]
 }

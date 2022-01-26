@@ -24,7 +24,7 @@ resource "azurerm_availability_set" "avset" {
 
 resource "azurerm_virtual_machine" "web_servers" {
   count                 = 2
-  name                  = "webserver-${count.index}"
+  name                  = "${local.naming_prefix}-webserver-${count.index}"
   location              = data.azurerm_resource_group.rg.location
   resource_group_name   = data.azurerm_resource_group.rg.name
   availability_set_id   = azurerm_availability_set.avset.id
@@ -71,7 +71,7 @@ data "azurerm_log_analytics_workspace" "log_ws" {
 
 
 data "azurerm_subnet" "subnet_web" {
-  name                 = "${local.naming_prefix}-subnet_gw"
+  name                 = "${local.naming_prefix}-subnet_webserver"
   resource_group_name  = data.azurerm_resource_group.rg.name
   virtual_network_name = "${local.naming_prefix}-vnet"
 }
