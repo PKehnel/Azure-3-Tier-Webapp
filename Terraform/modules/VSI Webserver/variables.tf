@@ -2,8 +2,11 @@ variable "azure_region" { default = "westeurope" }
 variable "env" { default = "usecase3" }
 variable "stage" { default = "dev" }
 
-variable "ports" {
-  type    = list(string)
-  default = ["22", "80"]
-}
+variable "webserver_name" { default = "webserver" }
+variable "vnet_name" { default = "vnet"}
+variable "log_ws_name" { default = "loganalyticsWS"}
+variable "gateway_name" { default = "gateway" }
+variable "database_name" { default = "db" }
+
+
 

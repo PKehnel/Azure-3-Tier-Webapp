@@ -5,11 +5,23 @@ locals {
 }
 
 data "azurerm_resource_group" "rg" {
-  name = "${var.env}-${var.stage}-rg"
+  name = "${local.naming_prefix}-rg"
 }
 
 data "template_file" "nginx_vm_cloud_init" {
-  template = file("install-nginx.sh")
+  template = file("${path.module}/install-nginx.sh")
+}
+
+data "azurerm_log_analytics_workspace" "log_ws" {
+  name                = "${local.naming_prefix}-${var.log_ws_name}"
+  resource_group_name = local.resource_group_name
+}
+
+
+data "azurerm_subnet" "subnet_web" {
+  name                 = "${local.naming_prefix}-subnet_${var.webserver_name}"
+  resource_group_name  = data.azurerm_resource_group.rg.name
+  virtual_network_name = "${local.naming_prefix}-${var.vnet_name}"
 }
 
 #Create an availability set with two fault/update domains, so each webserver is placed into its own domain
@@ -64,19 +76,7 @@ resource "azurerm_virtual_machine" "web_servers" {
   }
 }
 
-data "azurerm_log_analytics_workspace" "log_ws" {
-  name                = "${local.naming_prefix}-log_ws"
-  resource_group_name = data.azurerm_resource_group.rg.name
-}
-
-
-data "azurerm_subnet" "subnet_web" {
-  name                 = "${local.naming_prefix}-subnet_webserver"
-  resource_group_name  = data.azurerm_resource_group.rg.name
-  virtual_network_name = "${local.naming_prefix}-vnet"
-}
-
-#Create 2 FrontEnd NICs for the webservers in the web subnet
+# Create 2 FrontEnd NICs for the webservers in the web subnet
 resource "azurerm_network_interface" "nic_webservers" {
   count               = 2
   name                = "webnic-${count.index}"

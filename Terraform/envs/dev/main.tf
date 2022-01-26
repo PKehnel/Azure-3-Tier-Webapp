@@ -1,17 +1,3 @@
-terraform {
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~> 2.65"
-    }
-  }
-
-  required_version = ">= 1.1.0"
-}
-provider "azurerm" {
-  features {}
-}
-
 module "Vnet" {
   source = "../../modules/VNet"
 
@@ -21,7 +7,7 @@ module "Vnet" {
 }
 
 module "VSI_Webserver" {
-  source = "../../modules/VNet"
+  source = "../../modules/VSI Webserver"
 
   azure_region = var.azure_region
   stage        = var.stage
