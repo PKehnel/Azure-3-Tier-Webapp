@@ -8,3 +8,15 @@ variable "ports" {
   default = ["22", "80"]
 }
 
+variable "webserver_count" {
+  description = "Number of web server to provision."
+  type        = number
+  default     = 2
+}
+
+variable "dbserver_count" {
+  description = "Number of db server to provision."
+  type        = number
+  default     = 1
+}
+
