@@ -4,7 +4,7 @@ output "address" {
 }
 
 output "mysql_password" {
-  description = "Password of the Postgres DB"
+  description = "Password of the mySQL PaaS DB"
   value = "${azurerm_key_vault_secret.mysql_secret.value}"
   sensitive = true
 }

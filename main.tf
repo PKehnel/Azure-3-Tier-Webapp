@@ -576,7 +576,7 @@ resource "azurerm_key_vault_secret" "mysql_secret" {
   key_vault_id = azurerm_key_vault.vault.id
 }
 
-# Create ty mySQL database as PaaS service. Must be General Purpose SKU to be able to use Private Link service
+# Create the mySQL database as PaaS service. Must be General Purpose SKU to be able to use Private Link service
 resource "azurerm_mysql_server" "mysql" {
   name                = "usecase3-mysql"
   location            = "${azurerm_resource_group.rg.location}"
