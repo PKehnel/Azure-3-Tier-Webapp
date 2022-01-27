@@ -24,9 +24,14 @@ provider "azurerm" {
 
 }
 
-# Bootstrapping Template File
+# Bootstrapping Template File for nginx
 data "template_file" "nginx_vm_cloud_init" {
   template = file("install-nginx.sh")
+}
+
+# Bootstrapping Template File for postgresql
+data "template_file" "postgresql_vm_cloud_init" {
+  template = file("install-postgresql.sh")
 }
 
 #Create a resource group to hold all the resources
@@ -512,6 +517,7 @@ resource "azurerm_virtual_machine" "db_servers" {
     computer_name  = "dbserver-${count.index}"
     admin_username = "kyndryl"
     admin_password = "Password1234!"
+    custom_data    = base64encode(data.template_file.postgresql_vm_cloud_init.rendered)
   }
 
   os_profile_linux_config {
@@ -556,7 +562,7 @@ resource "azurerm_virtual_machine_extension" "da_db" {
 }
 
 # Generate a password for the postgres DB
-resource "random_string" "postgres_password" {
+resource "random_string" "mysql_password" {
   length = 14
   min_upper = 2
   min_lower = 2
@@ -564,9 +570,9 @@ resource "random_string" "postgres_password" {
   min_special = 2
 }
 
-resource "azurerm_key_vault_secret" "postgres_secret" {
-  name = "postgres-secret"
-  value = "${random_string.postgres_password.result}"
+resource "azurerm_key_vault_secret" "mysql_secret" {
+  name = "mysql-secret"
+  value = "${random_string.mysql_password.result}"
   key_vault_id = azurerm_key_vault.vault.id
 }
 
@@ -585,7 +591,7 @@ resource "azurerm_mysql_server" "mysql" {
   
   public_network_access_enabled = false
   administrator_login           = "kyndryl"
-  administrator_login_password  = "${azurerm_key_vault_secret.postgres_secret.value}"
+  administrator_login_password  = "${azurerm_key_vault_secret.mysql_secret.value}"
   version                       = "5.7"
   ssl_enforcement_enabled       = true
 }
