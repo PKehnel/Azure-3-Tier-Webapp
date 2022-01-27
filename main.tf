@@ -205,6 +205,7 @@ resource "azurerm_key_vault" "vault" {
     object_id    = data.azurerm_client_config.current.object_id
 
     certificate_permissions = ["create", "get", "list", "delete", "purge"]     # deleteand purge for "terraform destroy" to work
+    secret_permissions = ["set", "get", "delete", "purge", "recover"]
   }
 
   # Allow access from the gateway to access the certificate
@@ -367,8 +368,9 @@ resource "azurerm_application_gateway" "appgw" {
     name                       = local.request_routing_rule_name
     rule_type                  = "Basic"
     http_listener_name         = local.listener_name_http
-    backend_address_pool_name  = local.backend_address_pool_name
-    backend_http_settings_name = local.http_setting_name
+    #backend_address_pool_name  = local.backend_address_pool_name
+    #backend_http_settings_name = local.http_setting_name
+    redirect_configuration_name = local.redirect_configuration_name
   }
 
   request_routing_rule {
@@ -553,6 +555,21 @@ resource "azurerm_virtual_machine_extension" "da_db" {
   auto_upgrade_minor_version = true
 }
 
+# Generate a password for the postgres DB
+resource "random_string" "postgres_password" {
+  length = 14
+  min_upper = 2
+  min_lower = 2
+  min_numeric = 2
+  min_special = 2
+}
+
+resource "azurerm_key_vault_secret" "postgres_secret" {
+  name = "postgres-secret"
+  value = "${random_string.postgres_password.result}"
+  key_vault_id = azurerm_key_vault.vault.id
+}
+
 # Create ty mySQL database as PaaS service. Must be General Purpose SKU to be able to use Private Link service
 resource "azurerm_mysql_server" "mysql" {
   name                = "usecase3-mysql"
@@ -568,7 +585,7 @@ resource "azurerm_mysql_server" "mysql" {
   
   public_network_access_enabled = false
   administrator_login           = "kyndryl"
-  administrator_login_password  = "Password1234!"
+  administrator_login_password  = "${azurerm_key_vault_secret.postgres_secret.value}"
   version                       = "5.7"
   ssl_enforcement_enabled       = true
 }
