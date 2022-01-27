@@ -82,12 +82,14 @@ resource "azurerm_subnet" "subnet_web" {
   address_prefixes     = ["10.0.1.0/24"]
 }
 
-#Create the subnet that holds the db-servers
+# Create the subnet that holds the db-servers
+# As the subnet will host a private endpoint for the mySQL DB we must enforce the EP policies
 resource "azurerm_subnet" "subnet_db" {
   name                 = "subnet-db"
   resource_group_name  = "${azurerm_resource_group.rg.name}"
   virtual_network_name = "${azurerm_virtual_network.vnet.name}"
   address_prefixes     = ["10.0.2.0/24"]
+  enforce_private_link_endpoint_network_policies = true 
 }
 
 #Create the subnet that holds the for the bastion service
@@ -549,4 +551,39 @@ resource "azurerm_virtual_machine_extension" "da_db" {
   type                       = "DependencyAgentLinux"
   type_handler_version       = "9.5"
   auto_upgrade_minor_version = true
+}
+
+# Create ty mySQL database as PaaS service. Must be General Purpose SKU to be able to use Private Link service
+resource "azurerm_mysql_server" "mysql" {
+  name                = "usecase3-mysql"
+  location            = "${azurerm_resource_group.rg.location}"
+  resource_group_name = "${azurerm_resource_group.rg.name}"
+
+  sku_name = "GP_Gen5_2"
+
+  storage_mb                    = 5120
+  backup_retention_days         = 7
+  geo_redundant_backup_enabled  = false
+  auto_grow_enabled             = true
+  
+  public_network_access_enabled = false
+  administrator_login           = "kyndryl"
+  administrator_login_password  = "Password1234!"
+  version                       = "5.7"
+  ssl_enforcement_enabled       = true
+}
+
+# Create a private endpoint in the DB subnet and link it to the mysql database
+resource "azurerm_private_endpoint" "ep_mysql" {
+  name                = "mysql-endpoint"
+  location            = "${azurerm_resource_group.rg.location}"
+  resource_group_name = "${azurerm_resource_group.rg.name}"
+  subnet_id           = azurerm_subnet.subnet_db.id
+
+  private_service_connection {
+    name                           = "mysql-privateserviceconnection"
+    private_connection_resource_id = azurerm_mysql_server.mysql.id
+    subresource_names              = [ "mysqlServer" ]
+    is_manual_connection           = false
+  }
 }
