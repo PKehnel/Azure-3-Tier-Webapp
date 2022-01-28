@@ -1,23 +1,28 @@
 # uc3
- Terraform Script to provision an IaaS infrastructure in MS Azure
+![Terraform](https://img.shields.io/badge/terraform-%235835CC.svg?style=for-the-badge&logo=terraform&logoColor=white)
+ 
+Terraform Script to provision an IaaS infrastructure in MS Azure
 
- ![Archhitecture Overview](Documentation/images/UC3-Architecture.jpg?raw=true "Architecture Overview")
+---
 
+**Infrastructure**
 
+![Archhitecture Overview](Documentation/images/UC3-Architecture.jpg?raw=true "Architecture Overview")
+
+---
 **Open Topics:** 
 
-- Folder Structure & Modules
+**Iteration 2:** 
+
 - Tagging
 - Loops
 - Output
 - naming conventions
-- 2 Modules for both DB options (PostGresSQL vs MQSQL)
 - Passwords (sensitive)
-- Simple Test Case
-- Count DB2
+- Test and Debug
+- var Count DB2
 
-Iteration 2: 
-- Refactor Subnet location
+- Refactor Subnet location (currently in Vnet, wrong position)
 - Refactor Variables top part of each module
 - make DB modules generic
-- both DB in same Subnet
+- both DB in same Subnet yes / no
