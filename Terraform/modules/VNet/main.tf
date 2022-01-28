@@ -65,11 +65,3 @@ resource "azurerm_subnet" "subnet_db" {
   address_prefixes     = ["10.0.2.0/24"]
   enforce_private_link_endpoint_network_policies = true
 }
-
-#Create the subnet that holds the for the bastion service
-resource "azurerm_subnet" "subnet_bastion" {
-  name                 = "AzureBastionSubnet"
-  resource_group_name  = "${azurerm_resource_group.rg.name}"
-  virtual_network_name = "${azurerm_virtual_network.vnet.name}"
-  address_prefixes     = ["10.0.3.0/24"]
-}

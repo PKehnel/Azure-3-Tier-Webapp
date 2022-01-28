@@ -50,7 +50,7 @@ resource "azurerm_key_vault" "vault" {
 
 # Create a self signed certificate
 resource "azurerm_key_vault_certificate" "certificate" {
-  name         = "cert-${var.webserver_name}"
+  name         = "${local.naming_prefix}-cert-${var.webserver_name}"
   key_vault_id = azurerm_key_vault.vault.id
 
   certificate_policy {

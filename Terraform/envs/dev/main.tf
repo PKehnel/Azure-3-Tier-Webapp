@@ -30,7 +30,7 @@ module "PostGresSQL" {
   azure_region = var.azure_region
   stage        = var.stage
   env          = var.env
-  depends_on = [ module.Vnet, ]
+  depends_on = [ module.Vnet, module.Azure_Key_Vault ]
 }
 
 module "MySQL_SaaS" {
@@ -39,5 +39,23 @@ module "MySQL_SaaS" {
   azure_region = var.azure_region
   stage        = var.stage
   env          = var.env
+  depends_on = [ module.Vnet, module.Azure_Key_Vault ]
+}
+
+module "Bastion_Host" {
+  source = "../../modules/Bastion Host"
+
+  azure_region = var.azure_region
+  stage        = var.stage
+  env          = var.env
   depends_on = [ module.Vnet, ]
+}
+
+module "Application_Gateway" {
+  source = "../../modules/Application Gateway"
+
+  azure_region = var.azure_region
+  stage        = var.stage
+  env          = var.env
+  depends_on = [ module.Vnet, module.Azure_Key_Vault, module.VSI_Webserver ]
 }

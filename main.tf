@@ -97,92 +97,92 @@
 #  enforce_private_link_endpoint_network_policies = true
 #}
 
-#Create the subnet that holds the for the bastion service
-resource "azurerm_subnet" "subnet_bastion" {
-  name                 = "AzureBastionSubnet"
-  resource_group_name  = "${azurerm_resource_group.rg.name}"
-  virtual_network_name = "${azurerm_virtual_network.vnet.name}"
-  address_prefixes     = ["10.0.3.0/24"]
-}
+##Create the subnet that holds the for the bastion service
+#resource "azurerm_subnet" "subnet_bastion" {
+#  name                 = "AzureBastionSubnet"
+#  resource_group_name  = "${azurerm_resource_group.rg.name}"
+#  virtual_network_name = "${azurerm_virtual_network.vnet.name}"
+#  address_prefixes     = ["10.0.3.0/24"]
+#}
 
-#Create the PIP for the application gateway
-resource "azurerm_public_ip" "pip_gw" {
-  name                = "publicIPForGW"
-  location            = "${azurerm_resource_group.rg.location}"
-  resource_group_name = "${azurerm_resource_group.rg.name}"
-  allocation_method   = "Static"
-  sku                 = "Standard"
-}
+##Create the PIP for the application gateway
+#resource "azurerm_public_ip" "pip_gw" {
+#  name                = "publicIPForGW"
+#  location            = "${azurerm_resource_group.rg.location}"
+#  resource_group_name = "${azurerm_resource_group.rg.name}"
+#  allocation_method   = "Static"
+#  sku                 = "Standard"
+#}
 
-#Create the PIP for the bastion
-resource "azurerm_public_ip" "pip_bastion" {
-  name                = "publicIPForBastion"
-  location            = "${azurerm_resource_group.rg.location}"
-  resource_group_name = "${azurerm_resource_group.rg.name}"
-  allocation_method   = "Static"
-  sku                 = "Standard"
-}
+##Create the PIP for the bastion
+#resource "azurerm_public_ip" "pip_bastion" {
+#  name                = "publicIPForBastion"
+#  location            = "${azurerm_resource_group.rg.location}"
+#  resource_group_name = "${azurerm_resource_group.rg.name}"
+#  allocation_method   = "Static"
+#  sku                 = "Standard"
+#}
 
-#Create the bastion servie in the bastion subnet
-resource "azurerm_bastion_host" "bastion" {
-  name                = "bastion"
-  location            = "${azurerm_resource_group.rg.location}"
-  resource_group_name = "${azurerm_resource_group.rg.name}"
+##Create the bastion servie in the bastion subnet
+#resource "azurerm_bastion_host" "bastion" {
+#  name                = "bastion"
+#  location            = "${azurerm_resource_group.rg.location}"
+#  resource_group_name = "${azurerm_resource_group.rg.name}"
+#
+#  ip_configuration {
+#    name                 = "IPConfiguration"
+#    subnet_id            = azurerm_subnet.subnet_bastion.id
+#    public_ip_address_id = azurerm_public_ip.pip_bastion.id
+#  }
+#}
 
-  ip_configuration {
-    name                 = "IPConfiguration"
-    subnet_id            = azurerm_subnet.subnet_bastion.id
-    public_ip_address_id = azurerm_public_ip.pip_bastion.id
-  }
-}
+##Create 2 FrontEnd NICs for the webservers in the web subnet
+#resource "azurerm_network_interface" "nic_webservers" {
+#  count               = 2
+#  name                = "webnic-${count.index}"
+#  location            = "${azurerm_resource_group.rg.location}"
+#  resource_group_name = "${azurerm_resource_group.rg.name}"
+#
+#  ip_configuration {
+#    name                          = "IPConfiguration"
+#    subnet_id                     = azurerm_subnet.subnet_web.id
+#    private_ip_address_allocation = "dynamic"
+#  }
+#}
 
-#Create 2 FrontEnd NICs for the webservers in the web subnet
-resource "azurerm_network_interface" "nic_webservers" {
-  count               = 2
-  name                = "webnic-${count.index}"
-  location            = "${azurerm_resource_group.rg.location}"
-  resource_group_name = "${azurerm_resource_group.rg.name}"
+##Create a NIC for the db-server in the db subnet
+#resource "azurerm_network_interface" "nic_dbservers" {
+#  count               = 1
+#  name                = "dbnic-${count.index}"
+#  location            = "${azurerm_resource_group.rg.location}"
+#  resource_group_name = "${azurerm_resource_group.rg.name}"
+#
+#  ip_configuration {
+#    name                          = "IPConfiguration"
+#    subnet_id                     = azurerm_subnet.subnet_db.id
+#    private_ip_address_allocation = "dynamic"
+#  }
+#}
 
-  ip_configuration {
-    name                          = "IPConfiguration"
-    subnet_id                     = azurerm_subnet.subnet_web.id
-    private_ip_address_allocation = "dynamic"
-  }
-}
-
-#Create a NIC for the db-server in the db subnet
-resource "azurerm_network_interface" "nic_dbservers" {
-  count               = 1
-  name                = "dbnic-${count.index}"
-  location            = "${azurerm_resource_group.rg.location}"
-  resource_group_name = "${azurerm_resource_group.rg.name}"
-
-  ip_configuration {
-    name                          = "IPConfiguration"
-    subnet_id                     = azurerm_subnet.subnet_db.id
-    private_ip_address_allocation = "dynamic"
-  }
-}
-
-#Local definition of reused names for easier reference
-locals {
-  backend_address_pool_name      = "${azurerm_virtual_network.vnet.name}-beap"
-  frontend_port_name             = "${azurerm_virtual_network.vnet.name}-feport"
-  frontend_ip_configuration_name = "${azurerm_virtual_network.vnet.name}-feip"
-  http_setting_name              = "${azurerm_virtual_network.vnet.name}-be-htst"
-  https_setting_name             = "${azurerm_virtual_network.vnet.name}-be-httpsst"
-  listener_name_http             = "${azurerm_virtual_network.vnet.name}-httplstn"
-  listener_name_https            = "${azurerm_virtual_network.vnet.name}-httpslstn"
-  request_routing_rule_name      = "${azurerm_virtual_network.vnet.name}-rqrt"
-  redirect_configuration_name    = "${azurerm_virtual_network.vnet.name}-rdrcfg"
-}
-
-# Create a user assigned identity that represents the gateway for access to the vault
-resource "azurerm_user_assigned_identity" "agw" {
-  location            = "${azurerm_resource_group.rg.location}"
-  resource_group_name = "${azurerm_resource_group.rg.name}"
-  name                = "agw-msi"
-}
+##Local definition of reused names for easier reference
+#locals {
+#  backend_address_pool_name      = "${azurerm_virtual_network.vnet.name}-beap"
+#  frontend_port_name             = "${azurerm_virtual_network.vnet.name}-feport"
+#  frontend_ip_configuration_name = "${azurerm_virtual_network.vnet.name}-feip"
+#  http_setting_name              = "${azurerm_virtual_network.vnet.name}-be-htst"
+#  https_setting_name             = "${azurerm_virtual_network.vnet.name}-be-httpsst"
+#  listener_name_http             = "${azurerm_virtual_network.vnet.name}-httplstn"
+#  listener_name_https            = "${azurerm_virtual_network.vnet.name}-httpslstn"
+#  request_routing_rule_name      = "${azurerm_virtual_network.vnet.name}-rqrt"
+#  redirect_configuration_name    = "${azurerm_virtual_network.vnet.name}-rdrcfg"
+#}
+#
+## Create a user assigned identity that represents the gateway for access to the vault
+#resource "azurerm_user_assigned_identity" "agw" {
+#  location            = "${azurerm_resource_group.rg.location}"
+#  resource_group_name = "${azurerm_resource_group.rg.name}"
+#  name                = "agw-msi"
+#}
 
 # -
 # - Key Vault Configuration Start
