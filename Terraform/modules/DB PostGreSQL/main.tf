@@ -31,7 +31,7 @@ data "azurerm_log_analytics_workspace" "log_ws" {
 
 # Bootstrapping Template File for postgresql
 data "template_file" "postgresql_vm_cloud_init" {
-  template = file("install-postgresql.sh")
+  template = file("${path.module}/install-postgresql.sh")
 }
 
 #Create a NIC for the db-server in the db subnet
@@ -120,19 +120,4 @@ resource "azurerm_virtual_machine_extension" "da_db" {
   type                       = "DependencyAgentLinux"
   type_handler_version       = "9.5"
   auto_upgrade_minor_version = true
-}
-
-# Generate a password for the postgres DB
-resource "random_string" "mysql_password" {
-  length      = 14
-  min_upper   = 2
-  min_lower   = 2
-  min_numeric = 2
-  min_special = 2
-}
-
-resource "azurerm_key_vault_secret" "mysql_secret" {
-  name         = "mysql-secret"
-  value        = random_string.mysql_password.result
-  key_vault_id = data.azurerm_key_vault.vault.id
 }

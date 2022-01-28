@@ -20,7 +20,7 @@ data "azurerm_log_analytics_workspace" "log_ws" {
 
 data "azurerm_subnet" "subnet_web" {
   name                 = "${local.naming_prefix}-subnet_${var.webserver_name}"
-  resource_group_name  = data.azurerm_resource_group.rg.name
+  resource_group_name  = local.resource_group_name
   virtual_network_name = "${local.naming_prefix}-${var.vnet_name}"
 }
 

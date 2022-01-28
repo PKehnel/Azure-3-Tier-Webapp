@@ -15,3 +15,9 @@
 - Passwords (sensitive)
 - Simple Test Case
 - Count DB2
+
+Iteration 2: 
+- Refactor Subnet location
+- Refactor Variables top part of each module
+- make DB modules generic
+- both DB in same Subnet
