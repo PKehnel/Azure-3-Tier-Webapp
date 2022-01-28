@@ -50,7 +50,7 @@ resource "azurerm_network_interface" "nic_dbservers" {
 
 resource "azurerm_virtual_machine" "db_servers" {
   count                 = var.dbserver_count
-  name                  = "dbserver-${count.index}"
+  name                  = "${local.naming_prefix}-dbserver-${count.index}"
   location              = local.location
   availability_set_id   = data.azurerm_availability_set.avset.id
   resource_group_name   = local.resource_group_name

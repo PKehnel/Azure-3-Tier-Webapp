@@ -7,6 +7,6 @@ variable "vnet_name" { default = "vnet"}
 variable "log_ws_name" { default = "loganalyticsWS"}
 variable "gateway_name" { default = "gateway" }
 variable "database_name" { default = "db" }
-
+variable "webserver_count" {default = 2}
 
 

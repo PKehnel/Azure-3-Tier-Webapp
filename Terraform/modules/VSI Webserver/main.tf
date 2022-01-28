@@ -90,13 +90,13 @@ resource "azurerm_network_interface" "nic_webservers" {
   }
 }
 
-resource "azurerm_virtual_machine_extension" "vm_ext" {
-  count                      = 2
-  name                       = "OmsAgentForLinux"
-  virtual_machine_id         = azurerm_virtual_machine.web_servers[count.index].id
-  publisher                  = "Microsoft.EnterpriseCloud.Monitoring"
-  type                       = "OmsAgentForLinux"
-  type_handler_version       = "1.12"
+resource "azurerm_virtual_machine_extension" "vm_ext_web" {
+  count = var.webserver_count
+  name                 = "OmsAgentForLinux"
+  virtual_machine_id   = azurerm_virtual_machine.web_servers[count.index].id
+  publisher            = "Microsoft.EnterpriseCloud.Monitoring"
+  type                 = "OmsAgentForLinux"
+  type_handler_version = "1.12"
   auto_upgrade_minor_version = true
 
   settings = <<SETTINGS

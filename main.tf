@@ -403,89 +403,89 @@ resource "azurerm_network_interface_application_gateway_backend_address_pool_ass
   backend_address_pool_id = "${azurerm_application_gateway.appgw.backend_address_pool.0.id}"
 }
 
-#Create an availability set with two fault/update domains, so each webserver is placed into its own domain
-resource "azurerm_availability_set" "avset" {
-  name                          = "avset"
-  location                      = "${azurerm_resource_group.rg.location}"
-  resource_group_name           = "${azurerm_resource_group.rg.name}"
-  platform_fault_domain_count   = 2
-  platform_update_domain_count  = 2
-  managed                       = true
-}
+##Create an availability set with two fault/update domains, so each webserver is placed into its own domain
+#resource "azurerm_availability_set" "avset" {
+#  name                          = "avset"
+#  location                      = "${azurerm_resource_group.rg.location}"
+#  resource_group_name           = "${azurerm_resource_group.rg.name}"
+#  platform_fault_domain_count   = 2
+#  platform_update_domain_count  = 2
+#  managed                       = true
+#}
+#
+#resource "azurerm_virtual_machine" "web_servers" {
+#  count                 = var.webserver_count
+#  name                  = "webserver-${count.index}"
+#  location              = "${azurerm_resource_group.rg.location}"
+#  availability_set_id   = azurerm_availability_set.avset.id
+#  resource_group_name   = "${azurerm_resource_group.rg.name}"
+#  network_interface_ids = ["${element(azurerm_network_interface.nic_webservers.*.id, count.index)}"]
+#  vm_size               = "Standard_DS1_v2"
+#
+#  # Delete the OS disk automatically when deleting the VM
+#  delete_os_disk_on_termination = true
+#
+#  storage_image_reference {
+#    publisher = "Canonical"
+#    offer     = "UbuntuServer"
+#    sku       = "18.04-LTS"
+#    version   = "latest"
+#  }
+#
+#  storage_os_disk {
+#    name              = "web-osdisk-${count.index}"
+#    caching           = "ReadWrite"
+#    create_option     = "FromImage"
+#    managed_disk_type = "Standard_LRS"
+#  }
+#
+#  os_profile {
+#    computer_name  = "webserver-${count.index}"
+#    admin_username = "kyndryl"
+#    admin_password = "Password1234!"
+#    custom_data    = base64encode(data.template_file.nginx_vm_cloud_init.rendered)
+#  }
+#
+#  os_profile_linux_config {
+#    disable_password_authentication = false
+#  }
+#
+#  tags = {
+#    environment = "uc3-demo"
+#  }
+#}
 
-resource "azurerm_virtual_machine" "web_servers" {
-  count                 = var.webserver_count
-  name                  = "webserver-${count.index}"
-  location              = "${azurerm_resource_group.rg.location}"
-  availability_set_id   = azurerm_availability_set.avset.id
-  resource_group_name   = "${azurerm_resource_group.rg.name}"
-  network_interface_ids = ["${element(azurerm_network_interface.nic_webservers.*.id, count.index)}"]
-  vm_size               = "Standard_DS1_v2"
+#resource "azurerm_virtual_machine_extension" "vm_ext_web" {
+#  count = var.webserver_count
+#  name                 = "OmsAgentForLinux"
+#  virtual_machine_id   = azurerm_virtual_machine.web_servers[count.index].id
+#  publisher            = "Microsoft.EnterpriseCloud.Monitoring"
+#  type                 = "OmsAgentForLinux"
+#  type_handler_version = "1.12"
+#  auto_upgrade_minor_version = true
+#
+#  settings = <<SETTINGS
+#    {
+#        "workspaceId": "${azurerm_log_analytics_workspace.log_ws.workspace_id}"
+#    }
+#  SETTINGS
+#
+#  protected_settings = <<PROTECTEDSETTINGS
+#    {
+#        "workspaceKey": "${azurerm_log_analytics_workspace.log_ws.primary_shared_key}"
+#    }
+#  PROTECTEDSETTINGS
+#}
 
-  # Delete the OS disk automatically when deleting the VM
-  delete_os_disk_on_termination = true
-
-  storage_image_reference {
-    publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "18.04-LTS"
-    version   = "latest"
-  }
-
-  storage_os_disk {
-    name              = "web-osdisk-${count.index}"
-    caching           = "ReadWrite"
-    create_option     = "FromImage"
-    managed_disk_type = "Standard_LRS"
-  }
-
-  os_profile {
-    computer_name  = "webserver-${count.index}"
-    admin_username = "kyndryl"
-    admin_password = "Password1234!"
-    custom_data    = base64encode(data.template_file.nginx_vm_cloud_init.rendered)
-  }
-
-  os_profile_linux_config {
-    disable_password_authentication = false
-  }
-
-  tags = {
-    environment = "uc3-demo"
-  }
-}
-
-resource "azurerm_virtual_machine_extension" "vm_ext_web" {
-  count = var.webserver_count
-  name                 = "OmsAgentForLinux"
-  virtual_machine_id   = azurerm_virtual_machine.web_servers[count.index].id
-  publisher            = "Microsoft.EnterpriseCloud.Monitoring"
-  type                 = "OmsAgentForLinux"
-  type_handler_version = "1.12"
-  auto_upgrade_minor_version = true
-
-  settings = <<SETTINGS
-    {
-        "workspaceId": "${azurerm_log_analytics_workspace.log_ws.workspace_id}"
-    }
-  SETTINGS
-
-  protected_settings = <<PROTECTEDSETTINGS
-    {
-        "workspaceKey": "${azurerm_log_analytics_workspace.log_ws.primary_shared_key}"
-    }
-  PROTECTEDSETTINGS
-}
-
-resource "azurerm_virtual_machine_extension" "da_web" {
-  count = var.webserver_count
-  name                       = "DAExtension"
-  virtual_machine_id         = azurerm_virtual_machine.web_servers[count.index].id
-  publisher                  = "Microsoft.Azure.Monitoring.DependencyAgent"
-  type                       = "DependencyAgentLinux"
-  type_handler_version       = "9.5"
-  auto_upgrade_minor_version = true
-}
+#resource "azurerm_virtual_machine_extension" "da_web" {
+#  count = var.webserver_count
+#  name                       = "DAExtension"
+#  virtual_machine_id         = azurerm_virtual_machine.web_servers[count.index].id
+#  publisher                  = "Microsoft.Azure.Monitoring.DependencyAgent"
+#  type                       = "DependencyAgentLinux"
+#  type_handler_version       = "9.5"
+#  auto_upgrade_minor_version = true
+#}
 
 #resource "azurerm_virtual_machine" "db_servers" {
 #  count                 = var.dbserver_count
@@ -577,36 +577,36 @@ resource "azurerm_virtual_machine_extension" "da_web" {
 #}
 
 # Create the mySQL database as PaaS service. Must be General Purpose SKU to be able to use Private Link service
-resource "azurerm_mysql_server" "mysql" {
-  name                = "usecase3-mysql"
-  location            = "${azurerm_resource_group.rg.location}"
-  resource_group_name = "${azurerm_resource_group.rg.name}"
-
-  sku_name = "GP_Gen5_2"
-
-  storage_mb                    = 5120
-  backup_retention_days         = 7
-  geo_redundant_backup_enabled  = false
-  auto_grow_enabled             = true
-  
-  public_network_access_enabled = false
-  administrator_login           = "kyndryl"
-  administrator_login_password  = "${azurerm_key_vault_secret.mysql_secret.value}"
-  version                       = "5.7"
-  ssl_enforcement_enabled       = true
-}
-
-# Create a private endpoint in the DB subnet and link it to the mysql database
-resource "azurerm_private_endpoint" "ep_mysql" {
-  name                = "mysql-endpoint"
-  location            = "${azurerm_resource_group.rg.location}"
-  resource_group_name = "${azurerm_resource_group.rg.name}"
-  subnet_id           = azurerm_subnet.subnet_db.id
-
-  private_service_connection {
-    name                           = "mysql-privateserviceconnection"
-    private_connection_resource_id = azurerm_mysql_server.mysql.id
-    subresource_names              = [ "mysqlServer" ]
-    is_manual_connection           = false
-  }
-}
+#resource "azurerm_mysql_server" "mysql" {
+#  name                = "usecase3-mysql"
+#  location            = "${azurerm_resource_group.rg.location}"
+#  resource_group_name = "${azurerm_resource_group.rg.name}"
+#
+#  sku_name = "GP_Gen5_2"
+#
+#  storage_mb                    = 5120
+#  backup_retention_days         = 7
+#  geo_redundant_backup_enabled  = false
+#  auto_grow_enabled             = true
+#
+#  public_network_access_enabled = false
+#  administrator_login           = "kyndryl"
+#  administrator_login_password  = "${azurerm_key_vault_secret.mysql_secret.value}"
+#  version                       = "5.7"
+#  ssl_enforcement_enabled       = true
+#}
+#
+## Create a private endpoint in the DB subnet and link it to the mysql database
+#resource "azurerm_private_endpoint" "ep_mysql" {
+#  name                = "mysql-endpoint"
+#  location            = "${azurerm_resource_group.rg.location}"
+#  resource_group_name = "${azurerm_resource_group.rg.name}"
+#  subnet_id           = azurerm_subnet.subnet_db.id
+#
+#  private_service_connection {
+#    name                           = "mysql-privateserviceconnection"
+#    private_connection_resource_id = azurerm_mysql_server.mysql.id
+#    subresource_names              = [ "mysqlServer" ]
+#    is_manual_connection           = false
+#  }
+#}
