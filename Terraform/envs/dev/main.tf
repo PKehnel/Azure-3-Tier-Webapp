@@ -14,3 +14,12 @@ module "VSI_Webserver" {
   env          = var.env
   depends_on = [ module.Vnet, ]
 }
+
+module "Azure_Key_Vault" {
+  source = "../../modules/Azure Key Vault"
+
+  azure_region = var.azure_region
+  stage        = var.stage
+  env          = var.env
+  depends_on = [ module.Vnet, ]
+}

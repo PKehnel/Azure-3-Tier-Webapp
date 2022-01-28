@@ -14,3 +14,4 @@
 - 2 Modules for both DB options (PostGresSQL vs MQSQL)
 - Passwords (sensitive)
 - Simple Test Case
+- Count DB2

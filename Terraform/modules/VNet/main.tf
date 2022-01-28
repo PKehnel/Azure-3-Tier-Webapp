@@ -19,6 +19,20 @@ resource "azurerm_log_analytics_workspace" "log_ws" {
   retention_in_days   = 180
 }
 
+# Create the VM INsights Log Analytics Solution to collect additional metrics for VMs
+resource "azurerm_log_analytics_solution" "vminsights" {
+  solution_name         = "VMInsights"
+  location              = "${azurerm_resource_group.rg.location}"
+  resource_group_name   = "${azurerm_resource_group.rg.name}"
+  workspace_resource_id = azurerm_log_analytics_workspace.log_ws.id
+  workspace_name        = azurerm_log_analytics_workspace.log_ws.name
+
+  plan {
+    publisher = "Microsoft"
+    product   = "OMSGallery/VMInsights"
+  }
+}
+
 #Create the VNet
 resource "azurerm_virtual_network" "vnet" {
   name                = "${local.naming_prefix}-${var.vnet_name}"
@@ -49,4 +63,13 @@ resource "azurerm_subnet" "subnet_db" {
   resource_group_name  = local.resource_group_name
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = ["10.0.2.0/24"]
+  enforce_private_link_endpoint_network_policies = true
+}
+
+#Create the subnet that holds the for the bastion service
+resource "azurerm_subnet" "subnet_bastion" {
+  name                 = "AzureBastionSubnet"
+  resource_group_name  = "${azurerm_resource_group.rg.name}"
+  virtual_network_name = "${azurerm_virtual_network.vnet.name}"
+  address_prefixes     = ["10.0.3.0/24"]
 }
