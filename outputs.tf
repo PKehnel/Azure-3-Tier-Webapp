@@ -3,8 +3,8 @@ output "address" {
   value = "${azurerm_public_ip.pip_gw.ip_address}"
 }
 
-output "postgres_password" {
-  description = "Password of the Postgres DB"
-  value = "${azurerm_key_vault_secret.postgres_secret.value}"
+output "mysql_password" {
+  description = "Password of the mySQL PaaS DB"
+  value = "${azurerm_key_vault_secret.mysql_secret.value}"
   sensitive = true
 }
