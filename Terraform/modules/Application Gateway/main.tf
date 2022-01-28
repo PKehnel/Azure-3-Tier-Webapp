@@ -59,7 +59,7 @@ resource "azurerm_application_gateway" "appgw" {
 
   identity {
     type         = "UserAssigned"
-    identity_ids = [azurerm_user_assigned_identity.agw.id]
+    identity_ids = [data.azurerm_user_assigned_identity.agw.id]
   }
 
   gateway_ip_configuration {
@@ -162,8 +162,7 @@ resource "azurerm_network_interface_application_gateway_backend_address_pool_ass
   backend_address_pool_id = azurerm_application_gateway.appgw.backend_address_pool[0].id
 }
 
-resource "azurerm_user_assigned_identity" "agw" {
-  location            = local.location
-  resource_group_name = local.resource_group_name
+data "azurerm_user_assigned_identity" "agw" {
   name                = "agw-msi"
+  resource_group_name = local.resource_group_name
 }

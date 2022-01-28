@@ -9,7 +9,7 @@ data "azurerm_resource_group" "rg" {
 }
 
 # Create the subnet that holds the for the bastion service
-resource "azurerm_subnet" "subnet_bastionhost" {
+resource "azurerm_subnet" "subnet_bastion" {
   name                 = "AzureBastionSubnet" # This name is predefined by Azure
   resource_group_name  = local.resource_group_name
   virtual_network_name = "${local.naming_prefix}-${var.vnet_name}"
@@ -33,7 +33,7 @@ resource "azurerm_bastion_host" "bastion" {
 
   ip_configuration {
     name                 = "IPConfiguration"
-    subnet_id            = azurerm_subnet.subnet_bastionhost.id
+    subnet_id            = azurerm_subnet.subnet_bastion.id
     public_ip_address_id = azurerm_public_ip.pip_bastion.id
   }
 }
