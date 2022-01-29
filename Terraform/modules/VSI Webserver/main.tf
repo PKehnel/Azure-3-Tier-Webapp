@@ -35,7 +35,7 @@ resource "azurerm_availability_set" "avset" {
 }
 
 resource "azurerm_virtual_machine" "web_servers" {
-  count                 = 2
+  count                 = var.webserver_count
   name                  = "${local.naming_prefix}-webserver-${count.index}"
   location              = data.azurerm_resource_group.rg.location
   resource_group_name   = data.azurerm_resource_group.rg.name

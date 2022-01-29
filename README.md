@@ -14,14 +14,13 @@ Terraform Script to provision an IaaS infrastructure in MS Azure
 
 **Iteration 2:** 
 
-- Tagging
-- Loops
-- Output
-- naming conventions
-- Passwords (sensitive)
-- Test and Debug
-- var Count DB2
-
-- Refactor Subnet location (currently in Vnet, wrong position)
-- Refactor Variables top part of each module
+- Tagging (Example or do we add it to all?)
+- Loops (as show off)
+- Output (added a single output for gw ip, what else should we add)
+- naming conventions (check all files if we missed names)
 - both DB in same Subnet yes / no
+
+
+- Test and Debug [https://www.hashicorp.com/blog/testing-hashicorp-terraform](https://www.hashicorp.com/blog/testing-hashicorp-terraform)
+- Refactor Subnet location (currently in Vnet, wrong position)
+- Refactor Variables as top part of each module is currently the same
