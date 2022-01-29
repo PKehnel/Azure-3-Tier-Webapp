@@ -36,7 +36,6 @@ data "template_file" "postgresql_vm_cloud_init" {
 
 #Create a NIC for the db-server in the db subnet
 resource "azurerm_network_interface" "nic_dbservers" {
-  count               = 1
   name                = "dbnic-${count.index}"
   location            = local.location
   resource_group_name = local.resource_group_name

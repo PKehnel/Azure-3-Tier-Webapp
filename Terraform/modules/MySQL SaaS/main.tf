@@ -32,7 +32,7 @@ resource "azurerm_mysql_server" "mysql" {
   auto_grow_enabled            = true
 
   public_network_access_enabled = false
-  administrator_login           = "kyndryl"
+  administrator_login           = "${local.naming_prefix}-mysql-admin"
   administrator_login_password  = azurerm_key_vault_secret.mysql_secret.value
   version                       = "5.7"
   ssl_enforcement_enabled       = true

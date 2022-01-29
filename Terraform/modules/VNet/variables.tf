@@ -3,10 +3,15 @@ variable "env" { default = "usecase3" }
 variable "stage" { default = "dev" }
 
 variable "webserver_name" { default = "webserver" }
-variable "vnet_name" { default = "vnet"}
-variable "log_ws_name" { default = "loganalyticsWS"}
+variable "vnet_name" { default = "vnet" }
+variable "log_ws_name" { default = "loganalyticsWS" }
 variable "gateway_name" { default = "gateway" }
 variable "database_name" { default = "db" }
 variable "bastionhost_name" { default = "BastionHost" }
 
+variable "standard_tags" {
+  default     = {}
+  description = "Additional resource tags"
+  type        = map(string)
+}
 

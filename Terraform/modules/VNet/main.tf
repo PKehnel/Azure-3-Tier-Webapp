@@ -1,6 +1,6 @@
 locals {
-  naming_prefix = "${var.env}-${var.stage}"
-  location = azurerm_resource_group.rg.location
+  naming_prefix       = "${var.env}-${var.stage}"
+  location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 }
 
@@ -8,6 +8,8 @@ locals {
 resource "azurerm_resource_group" "rg" {
   name     = "${local.naming_prefix}-rg"
   location = var.azure_region
+  tags = merge(var.standard_tags,
+    {Type = "PoC" },)
 }
 
 #Create a LogAnalytics Workspace
@@ -22,8 +24,8 @@ resource "azurerm_log_analytics_workspace" "log_ws" {
 # Create the VM INsights Log Analytics Solution to collect additional metrics for VMs
 resource "azurerm_log_analytics_solution" "vminsights" {
   solution_name         = "VMInsights"
-  location              = "${azurerm_resource_group.rg.location}"
-  resource_group_name   = "${azurerm_resource_group.rg.name}"
+  location              = azurerm_resource_group.rg.location
+  resource_group_name   = azurerm_resource_group.rg.name
   workspace_resource_id = azurerm_log_analytics_workspace.log_ws.id
   workspace_name        = azurerm_log_analytics_workspace.log_ws.name
 
@@ -59,9 +61,9 @@ resource "azurerm_subnet" "subnet_web" {
 
 #Create the subnet that holds the db-servers
 resource "azurerm_subnet" "subnet_db" {
-  name                 = "${local.naming_prefix}-subnet_${var.database_name}"
-  resource_group_name  = local.resource_group_name
-  virtual_network_name = azurerm_virtual_network.vnet.name
-  address_prefixes     = ["10.0.2.0/24"]
+  name                                           = "${local.naming_prefix}-subnet_${var.database_name}"
+  resource_group_name                            = local.resource_group_name
+  virtual_network_name                           = azurerm_virtual_network.vnet.name
+  address_prefixes                               = ["10.0.2.0/24"]
   enforce_private_link_endpoint_network_policies = true
 }

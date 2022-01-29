@@ -24,5 +24,4 @@ Terraform Script to provision an IaaS infrastructure in MS Azure
 
 - Refactor Subnet location (currently in Vnet, wrong position)
 - Refactor Variables top part of each module
-- make DB modules generic
 - both DB in same Subnet yes / no

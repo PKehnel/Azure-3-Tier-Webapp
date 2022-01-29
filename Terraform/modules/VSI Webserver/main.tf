@@ -62,8 +62,8 @@ resource "azurerm_virtual_machine" "web_servers" {
 
   os_profile {
     computer_name  = "webserver-${count.index}"
-    admin_username = "kyndryl"
-    admin_password = "Password1234!"
+    admin_username = "${local.naming_prefix}-${var.webserver_name}-${count.index}-admin"
+    admin_password = azurerm_key_vault_secret.webserver-secret.value
     custom_data    = base64encode(data.template_file.nginx_vm_cloud_init.rendered)
   }
 
@@ -110,4 +110,25 @@ resource "azurerm_virtual_machine_extension" "vm_ext_web" {
         "workspaceKey": "${data.azurerm_log_analytics_workspace.log_ws.primary_shared_key}"
     }
   PROTECTEDSETTINGS
+}
+
+data "azurerm_key_vault" "vault" {
+  name                = "${local.naming_prefix}-keyvault"
+  resource_group_name = local.resource_group_name
+}
+
+
+# Generate a password for webserver
+resource "random_string" "webserver_password" {
+  length      = 14
+  min_upper   = 2
+  min_lower   = 2
+  min_numeric = 2
+  min_special = 2
+}
+
+resource "azurerm_key_vault_secret" "webserver-secret" {
+  name         = "${local.naming_prefix}-webserver-secret"
+  value        = random_string.webserver_password.result
+  key_vault_id = data.azurerm_key_vault.vault.id
 }
