@@ -14,15 +14,23 @@ Terraform Script to provision an IaaS infrastructure in MS Azure
 
 **Iteration 2:** 
 
-- Tagging
-- Loops
-- Output
-- naming conventions
-- Passwords (sensitive)
-- Test and Debug
-- var Count DB2
+- Tagging (Example or do we add it to all?) (Policy tagging)
+- naming conventions (check all files if we missed names)
 
-- Refactor Subnet location (currently in Vnet, wrong position)
-- Refactor Variables top part of each module
-- make DB modules generic
-- both DB in same Subnet yes / no
+- Test and Debug [https://www.hashicorp.com/blog/testing-hashicorp-terraform](https://www.hashicorp.com/blog/testing-hashicorp-terraform)
+- Refactor Variables as top part of each module is currently the same
+
+
+Parameter size machines
+auswahl betriebsystem
+Kusto Queries zur Logauswertung (2-3)
+
+## Application Gateway vs "Classic" Load Balancer
+
+[Azure Application Gateway](https://docs.microsoft.com/en-us/azure/application-gateway/overview) is a web traffic load balancer that enables you to manage traffic to your web applications. (OSI Layer 7)
+
+Traditional load balancers operate at the transport layer (OSI layer 4 - TCP and UDP) and route traffic based on source IP address and port, to a destination IP address and port.
+
+Advantage of Application gateway: 
+- easily integrate WAF
+- 80 / 443 ag perfect

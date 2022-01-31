@@ -15,7 +15,7 @@ locals {
 }
 
 data "azurerm_key_vault" "vault" {
-  name                = "${local.naming_prefix}-keyvault"
+  name                = var.vault-name
   resource_group_name = local.resource_group_name
 }
 
@@ -28,11 +28,12 @@ data "azurerm_resource_group" "rg" {
   name = "${local.naming_prefix}-rg"
 }
 
-data "azurerm_subnet" "subnet_gw" {
-  name                 = "${local.naming_prefix}-subnet_${var.gateway_name}"
-  resource_group_name  = data.azurerm_resource_group.rg.name
+data "azurerm_subnet" "subnet" {
+  name                 = "${local.naming_prefix}-subnet_${var.app_gateway_name}"
+  resource_group_name  = local.resource_group_name
   virtual_network_name = "${local.naming_prefix}-${var.vnet_name}"
 }
+
 
 #Create the PIP for the application gateway
 resource "azurerm_public_ip" "pip_gw" {
@@ -46,7 +47,7 @@ resource "azurerm_public_ip" "pip_gw" {
 
 #Create the Application Gateway
 resource "azurerm_application_gateway" "appgw" {
-  name                = "AppGateway-UC3"
+  name                = var.app_gateway_name
   location            = local.location
   resource_group_name = local.resource_group_name
 
@@ -64,7 +65,7 @@ resource "azurerm_application_gateway" "appgw" {
 
   gateway_ip_configuration {
     name      = "appgw-ip-configuration"
-    subnet_id = data.azurerm_subnet.subnet_gw.id
+    subnet_id = data.azurerm_subnet.subnet.id
   }
 
   frontend_port {
@@ -150,7 +151,7 @@ resource "azurerm_application_gateway" "appgw" {
 
 data "azurerm_network_interface" "nic_webservers" {
   count               = 2
-  name                = "webnic-${count.index}"
+  name                = "webnic-${count.index}-${var.webserver_name}"
   resource_group_name = local.resource_group_name
 }
 

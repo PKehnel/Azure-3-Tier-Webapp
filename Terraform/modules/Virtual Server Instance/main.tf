@@ -9,7 +9,7 @@ data "azurerm_resource_group" "rg" {
 }
 
 data "template_file" "nginx_vm_cloud_init" {
-  template = file("${path.module}/install-nginx.sh")
+  template = file("${path.module}/${var.script}")
 }
 
 data "azurerm_log_analytics_workspace" "log_ws" {
@@ -17,15 +17,17 @@ data "azurerm_log_analytics_workspace" "log_ws" {
   resource_group_name = local.resource_group_name
 }
 
-data "azurerm_subnet" "subnet_web" {
-  name                 = "${local.naming_prefix}-subnet_${var.webserver_name}"
+
+#Create the subnet that holds the web-servers
+data "azurerm_subnet" "subnet" {
+  name                 = "${local.naming_prefix}-subnet_${var.virtual_server_name}"
   resource_group_name  = local.resource_group_name
   virtual_network_name = "${local.naming_prefix}-${var.vnet_name}"
 }
 
 #Create an availability set with two fault/update domains, so each webserver is placed into its own domain
 resource "azurerm_availability_set" "avset" {
-  name                         = "${local.naming_prefix}-avset"
+  name                         = "${local.naming_prefix}-${var.virtual_server_name}-avset"
   location                     = data.azurerm_resource_group.rg.location
   resource_group_name          = data.azurerm_resource_group.rg.name
   platform_fault_domain_count  = 2
@@ -33,9 +35,9 @@ resource "azurerm_availability_set" "avset" {
   managed                      = true
 }
 
-resource "azurerm_virtual_machine" "web_servers" {
-  count                 = 2
-  name                  = "${local.naming_prefix}-webserver-${count.index}"
+resource "azurerm_virtual_machine" "virtual_servers" {
+  count                 = var.virtual_server_count
+  name                  = "${local.naming_prefix}-${var.virtual_server_name}-${count.index}"
   location              = data.azurerm_resource_group.rg.location
   resource_group_name   = data.azurerm_resource_group.rg.name
   availability_set_id   = azurerm_availability_set.avset.id
@@ -53,16 +55,16 @@ resource "azurerm_virtual_machine" "web_servers" {
   }
 
   storage_os_disk {
-    name              = "myosdisk-${count.index}"
+    name              = "disk-${count.index}-${var.virtual_server_name}"
     caching           = "ReadWrite"
     create_option     = "FromImage"
     managed_disk_type = "Standard_LRS"
   }
 
   os_profile {
-    computer_name  = "webserver-${count.index}"
-    admin_username = "kyndryl"
-    admin_password = "Password1234!"
+    computer_name  = "${var.virtual_server_name}-${count.index}"
+    admin_username = "${local.naming_prefix}-${var.virtual_server_name}-${count.index}-admin"
+    admin_password = azurerm_key_vault_secret.virtual_server_secret.value
     custom_data    = base64encode(data.template_file.nginx_vm_cloud_init.rendered)
   }
 
@@ -75,27 +77,27 @@ resource "azurerm_virtual_machine" "web_servers" {
   }
 }
 
-# Create 2 FrontEnd NICs for the webservers in the web subnet
+# Create FrontEnd NICs for the webservers in the web subnet
 resource "azurerm_network_interface" "nic_webservers" {
-  count               = 2
-  name                = "webnic-${count.index}"
+  count               = var.virtual_server_count
+  name                = "webnic-${count.index}-${var.virtual_server_name}"
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
 
   ip_configuration {
     name                          = "IPConfiguration"
-    subnet_id                     = data.azurerm_subnet.subnet_web.id
+    subnet_id                     = data.azurerm_subnet.subnet.id
     private_ip_address_allocation = "dynamic"
   }
 }
 
 resource "azurerm_virtual_machine_extension" "vm_ext_web" {
-  count                = var.webserver_count
-  name                 = "OmsAgentForLinux"
-  virtual_machine_id   = azurerm_virtual_machine.web_servers[count.index].id
-  publisher            = "Microsoft.EnterpriseCloud.Monitoring"
-  type                 = "OmsAgentForLinux"
-  type_handler_version = "1.12"
+  count                      = var.virtual_server_count
+  name                       = "OmsAgentForLinux"
+  virtual_machine_id         = azurerm_virtual_machine.virtual_servers[count.index].id
+  publisher                  = "Microsoft.EnterpriseCloud.Monitoring"
+  type                       = "OmsAgentForLinux"
+  type_handler_version       = "1.12"
   auto_upgrade_minor_version = true
 
   settings = <<SETTINGS
@@ -112,11 +114,32 @@ resource "azurerm_virtual_machine_extension" "vm_ext_web" {
 }
 
 resource "azurerm_virtual_machine_extension" "da_web" {
-  count                      = var.webserver_count
+  count                      = var.virtual_server_count
   name                       = "DAExtension"
-  virtual_machine_id         = azurerm_virtual_machine.web_servers[count.index].id
+  virtual_machine_id         = azurerm_virtual_machine.virtual_servers[count.index].id
   publisher                  = "Microsoft.Azure.Monitoring.DependencyAgent"
   type                       = "DependencyAgentLinux"
   type_handler_version       = "9.5"
   auto_upgrade_minor_version = true
+}
+
+data "azurerm_key_vault" "vault" {
+  name                = var.vault-name
+  resource_group_name = local.resource_group_name
+}
+
+
+# Generate a password for webserver
+resource "random_string" "virtual_server_password" {
+  length      = 14
+  min_upper   = 2
+  min_lower   = 2
+  min_numeric = 2
+  min_special = 2
+}
+
+resource "azurerm_key_vault_secret" "virtual_server_secret" {
+  name         = "${local.naming_prefix}-secret-${var.virtual_server_name}"
+  value        = random_string.virtual_server_password.result
+  key_vault_id = data.azurerm_key_vault.vault.id
 }
