@@ -11,7 +11,7 @@ data "azurerm_resource_group" "rg" {
 data "azurerm_client_config" "current" {}
 
 resource "random_string" "random_suffix" {
-  length = 4
+  length  = 4
   special = false
 }
 
@@ -27,25 +27,25 @@ resource "azurerm_key_vault" "vault" {
 
   # Allow access for Builder ID
   access_policy {
-    tenant_id    = data.azurerm_client_config.current.tenant_id
-    object_id    = data.azurerm_client_config.current.object_id
+    tenant_id = data.azurerm_client_config.current.tenant_id
+    object_id = data.azurerm_client_config.current.object_id
 
-    certificate_permissions = ["create", "get", "list", "recover", "delete", "purge"]     # delete and purge for "terraform destroy" to work
-    secret_permissions = ["set", "get", "delete", "purge", "recover"]
+    certificate_permissions = ["create", "get", "list", "recover", "delete", "purge"] # delete and purge for "terraform destroy" to work
+    secret_permissions      = ["set", "get", "delete", "purge", "recover"]
   }
 
   # Allow access from the gateway to access the certificate
   access_policy {
-    tenant_id    = data.azurerm_client_config.current.tenant_id
-    object_id    = azurerm_user_assigned_identity.agw.principal_id
+    tenant_id = data.azurerm_client_config.current.tenant_id
+    object_id = azurerm_user_assigned_identity.agw.principal_id
 
     certificate_permissions = ["get"]
-    secret_permissions = ["get"]
+    secret_permissions      = ["get"]
   }
 
   network_acls {
-      default_action = "Allow"
-      bypass         = "AzureServices"
+    default_action = "Allow"
+    bypass         = "AzureServices"
   }
 }
 

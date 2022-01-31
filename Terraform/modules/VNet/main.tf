@@ -9,7 +9,7 @@ resource "azurerm_resource_group" "rg" {
   name     = "${local.naming_prefix}-rg"
   location = var.azure_region
   tags = merge(var.standard_tags,
-    {Type = "PoC" },)
+  { Type = "PoC" }, )
 }
 
 #Create a LogAnalytics Workspace
@@ -45,11 +45,11 @@ resource "azurerm_virtual_network" "vnet" {
 
 
 resource "azurerm_subnet" "subnet" {
-  for_each = {for key, value in var.subnets : key => value}
-  name           = each.value.name_suffix != "AzureBastionSubnet" ? "${local.naming_prefix}-subnet_${each.value.name_suffix}" : "AzureBastionSubnet"
-  address_prefixes = [each.value.cidr]
+  for_each             = { for key, value in var.subnets : key => value }
+  name                 = each.value.name_suffix != "AzureBastionSubnet" ? "${local.naming_prefix}-subnet_${each.value.name_suffix}" : "AzureBastionSubnet"
+  address_prefixes     = [each.value.cidr]
   resource_group_name  = local.resource_group_name
-  virtual_network_name =azurerm_virtual_network.vnet.name
+  virtual_network_name = azurerm_virtual_network.vnet.name
   # required to be set to true, when using NSG as they are not integrated atm
   # https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet
 

@@ -10,9 +10,9 @@ data "azurerm_resource_group" "rg" {
 
 #Create the subnet that holds the db-servers
 data "azurerm_subnet" "subnet" {
-  name                                           = "${local.naming_prefix}-subnet_${var.mysql_name}"
-  resource_group_name                            = local.resource_group_name
-  virtual_network_name                           = "${local.naming_prefix}-${var.vnet_name}"
+  name                 = "${local.naming_prefix}-subnet_${var.mysql_name}"
+  resource_group_name  = local.resource_group_name
+  virtual_network_name = "${local.naming_prefix}-${var.vnet_name}"
 }
 
 data "azurerm_key_vault" "vault" {
