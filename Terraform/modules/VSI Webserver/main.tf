@@ -17,7 +17,6 @@ data "azurerm_log_analytics_workspace" "log_ws" {
   resource_group_name = local.resource_group_name
 }
 
-
 data "azurerm_subnet" "subnet_web" {
   name                 = "${local.naming_prefix}-subnet_${var.webserver_name}"
   resource_group_name  = local.resource_group_name
@@ -91,7 +90,7 @@ resource "azurerm_network_interface" "nic_webservers" {
 }
 
 resource "azurerm_virtual_machine_extension" "vm_ext_web" {
-  count = var.webserver_count
+  count                = var.webserver_count
   name                 = "OmsAgentForLinux"
   virtual_machine_id   = azurerm_virtual_machine.web_servers[count.index].id
   publisher            = "Microsoft.EnterpriseCloud.Monitoring"
@@ -110,6 +109,16 @@ resource "azurerm_virtual_machine_extension" "vm_ext_web" {
         "workspaceKey": "${data.azurerm_log_analytics_workspace.log_ws.primary_shared_key}"
     }
   PROTECTEDSETTINGS
+}
+
+resource "azurerm_virtual_machine_extension" "da_web" {
+  count                      = var.webserver_count
+  name                       = "DAExtension"
+  virtual_machine_id         = azurerm_virtual_machine.web_servers[count.index].id
+  publisher                  = "Microsoft.Azure.Monitoring.DependencyAgent"
+  type                       = "DependencyAgentLinux"
+  type_handler_version       = "9.5"
+  auto_upgrade_minor_version = true
 }
 
 data "azurerm_key_vault" "vault" {
