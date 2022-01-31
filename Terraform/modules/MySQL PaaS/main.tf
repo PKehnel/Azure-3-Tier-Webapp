@@ -7,14 +7,16 @@ locals {
 data "azurerm_resource_group" "rg" {
   name = "${local.naming_prefix}-rg"
 }
-data "azurerm_subnet" "subnet_db" {
-  name                 = "${local.naming_prefix}-subnet_${var.database_name}"
+
+#Create the subnet that holds the db-servers
+data "azurerm_subnet" "subnet" {
+  name                 = "${local.naming_prefix}-subnet_${var.mysql_name}"
   resource_group_name  = local.resource_group_name
   virtual_network_name = "${local.naming_prefix}-${var.vnet_name}"
 }
 
 data "azurerm_key_vault" "vault" {
-  name                = "${local.naming_prefix}-keyvault"
+  name                = var.vault-name
   resource_group_name = local.resource_group_name
 }
 
@@ -32,7 +34,7 @@ resource "azurerm_mysql_server" "mysql" {
   auto_grow_enabled            = true
 
   public_network_access_enabled = false
-  administrator_login           = "kyndryl"
+  administrator_login           = "${local.naming_prefix}-mysql"
   administrator_login_password  = azurerm_key_vault_secret.mysql_secret.value
   version                       = "5.7"
   ssl_enforcement_enabled       = true
@@ -43,7 +45,7 @@ resource "azurerm_private_endpoint" "ep_mysql" {
   name                = "${local.naming_prefix}-mysql-endpoint"
   location            = local.location
   resource_group_name = local.resource_group_name
-  subnet_id           = data.azurerm_subnet.subnet_db.id
+  subnet_id           = data.azurerm_subnet.subnet.id
 
   private_service_connection {
     name                           = "${local.naming_prefix}-mysql-privateserviceconnection"

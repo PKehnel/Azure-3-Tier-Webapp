@@ -14,7 +14,7 @@ data "azurerm_availability_set" "avset" {
 }
 
 data "azurerm_key_vault" "vault" {
-  name                = "${local.naming_prefix}-keyvault"
+  name                = var.vault-name
   resource_group_name = local.resource_group_name
 }
 
@@ -36,8 +36,7 @@ data "template_file" "postgresql_vm_cloud_init" {
 
 #Create a NIC for the db-server in the db subnet
 resource "azurerm_network_interface" "nic_dbservers" {
-  count               = 1
-  name                = "dbnic-${count.index}"
+  name                = "dbnic"
   location            = local.location
   resource_group_name = local.resource_group_name
 
@@ -49,12 +48,11 @@ resource "azurerm_network_interface" "nic_dbservers" {
 }
 
 resource "azurerm_virtual_machine" "db_servers" {
-  count                 = var.dbserver_count
-  name                  = "${local.naming_prefix}-dbserver-${count.index}"
+  name                  = "${local.naming_prefix}-dbserver"
   location              = local.location
   availability_set_id   = data.azurerm_availability_set.avset.id
   resource_group_name   = local.resource_group_name
-  network_interface_ids = [element(azurerm_network_interface.nic_dbservers.*.id, count.index)]
+  network_interface_ids = [azurerm_network_interface.nic_dbservers.id]
   vm_size               = "Standard_DS1_v2"
 
   # Delete the OS disk automatically when deleting the VM
@@ -68,14 +66,14 @@ resource "azurerm_virtual_machine" "db_servers" {
   }
 
   storage_os_disk {
-    name              = "db-osdisk-${count.index}"
+    name              = "db-osdisk"
     caching           = "ReadWrite"
     create_option     = "FromImage"
     managed_disk_type = "Standard_LRS"
   }
-
+  #todo password
   os_profile {
-    computer_name  = "dbserver-${count.index}"
+    computer_name  = "dbserver"
     admin_username = "kyndryl"
     admin_password = "Password1234!"
     custom_data    = base64encode(data.template_file.postgresql_vm_cloud_init.rendered)
@@ -91,7 +89,6 @@ resource "azurerm_virtual_machine" "db_servers" {
 }
 
 resource "azurerm_virtual_machine_extension" "vm_ext_db" {
-  count                      = var.dbserver_count
   name                       = "OmsAgentForLinux"
   virtual_machine_id         = azurerm_virtual_machine.db_servers[count.index].id
   publisher                  = "Microsoft.EnterpriseCloud.Monitoring"
@@ -113,9 +110,8 @@ resource "azurerm_virtual_machine_extension" "vm_ext_db" {
 }
 
 resource "azurerm_virtual_machine_extension" "da_db" {
-  count                      = var.dbserver_count
   name                       = "DAExtension"
-  virtual_machine_id         = azurerm_virtual_machine.db_servers[count.index].id
+  virtual_machine_id         = azurerm_virtual_machine.db_servers.id
   publisher                  = "Microsoft.Azure.Monitoring.DependencyAgent"
   type                       = "DependencyAgentLinux"
   type_handler_version       = "9.5"
