@@ -14,13 +14,19 @@ Terraform Script to provision an IaaS infrastructure in MS Azure
 
 **Iteration 2:** 
 
-- Tagging (Example or do we add it to all?)
-- Loops (as show off)
-- Output (added a single output for gw ip, what else should we add)
+- Tagging (Example or do we add it to all?) (Policy tagging)
+- Output (gw ip, )
 - naming conventions (check all files if we missed names)
-- both DB in same Subnet yes / no
-
 
 - Test and Debug [https://www.hashicorp.com/blog/testing-hashicorp-terraform](https://www.hashicorp.com/blog/testing-hashicorp-terraform)
-- Refactor Subnet location (currently in Vnet, wrong position)
 - Refactor Variables as top part of each module is currently the same
+
+- VSI Webserver and Postgress via 1 module 
+
+
+Parameter size machines
+auswahl betriebsystem
+Kusto Queries zur Logauswertung (2-3)
+advantage of Application gateway: 
+- can add WAF
+- 80 / 443 ag perfect

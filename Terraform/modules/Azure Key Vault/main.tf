@@ -16,7 +16,8 @@ resource "random_string" "random_name" {
 }
 
 resource "azurerm_key_vault" "vault" {
-  name                       = "${local.naming_prefix}-keyvault"
+  # Vault names are globaly unique and max 24 chars, so add a timestamp.
+  name                       = "${local.naming_prefix}-keyvault-1"
   location                   = local.location
   resource_group_name        = local.resource_group_name
   tenant_id                  = data.azurerm_client_config.current.tenant_id

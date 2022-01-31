@@ -38,32 +38,20 @@ resource "azurerm_log_analytics_solution" "vminsights" {
 #Create the VNet
 resource "azurerm_virtual_network" "vnet" {
   name                = "${local.naming_prefix}-${var.vnet_name}"
-  address_space       = ["10.0.0.0/16"]
+  address_space       = [var.address_space]
   location            = local.location
   resource_group_name = local.resource_group_name
 }
 
-#Create the subnet that holds the app-gateway
-resource "azurerm_subnet" "subnet_gw" {
-  name                 = "${local.naming_prefix}-subnet_${var.gateway_name}"
-  resource_group_name  = local.resource_group_name
-  virtual_network_name = azurerm_virtual_network.vnet.name
-  address_prefixes     = ["10.0.0.0/24"]
-}
 
-#Create the subnet that holds the web-servers
-resource "azurerm_subnet" "subnet_web" {
-  name                 = "${local.naming_prefix}-subnet_${var.webserver_name}"
+resource "azurerm_subnet" "subnet" {
+  for_each = {for key, value in var.subnets : key => value}
+  name           = each.value.name_suffix != "AzureBastionSubnet" ? "${local.naming_prefix}-subnet_${each.value.name_suffix}" : "AzureBastionSubnet"
+  address_prefixes = [each.value.cidr]
   resource_group_name  = local.resource_group_name
-  virtual_network_name = azurerm_virtual_network.vnet.name
-  address_prefixes     = ["10.0.1.0/24"]
-}
+  virtual_network_name =azurerm_virtual_network.vnet.name
+  # required to be set to true, when using NSG as they are not integrated atm
+  # https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet
 
-#Create the subnet that holds the db-servers
-resource "azurerm_subnet" "subnet_db" {
-  name                                           = "${local.naming_prefix}-subnet_${var.database_name}"
-  resource_group_name                            = local.resource_group_name
-  virtual_network_name                           = azurerm_virtual_network.vnet.name
-  address_prefixes                               = ["10.0.2.0/24"]
-  enforce_private_link_endpoint_network_policies = true
+  enforce_private_link_endpoint_network_policies = each.value.disable_private_endpoint_only
 }
