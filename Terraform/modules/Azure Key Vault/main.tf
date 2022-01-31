@@ -10,14 +10,14 @@ data "azurerm_resource_group" "rg" {
 
 data "azurerm_client_config" "current" {}
 
-resource "random_string" "random_name" {
-  length = 8
+resource "random_string" "random_suffix" {
+  length = 4
   special = false
 }
 
 resource "azurerm_key_vault" "vault" {
-  # Vault names are globaly unique and max 24 chars, so add a timestamp.
-  name                       = "${local.naming_prefix}-keyvault-1"
+  # Vault names are globaly unique and max 24 chars, so add random string
+  name                       = "${local.naming_prefix}-KV-${random_string.random_suffix.result}"
   location                   = local.location
   resource_group_name        = local.resource_group_name
   tenant_id                  = data.azurerm_client_config.current.tenant_id
@@ -110,9 +110,10 @@ resource "azurerm_user_assigned_identity" "agw" {
   name                = "agw-msi"
 }
 
+# TODO Can this be removed
 # Allows some time for the certificate to be created
-resource "time_sleep" "wait_60_seconds" {
+resource "time_sleep" "wait_seconds" {
   depends_on = [azurerm_key_vault_certificate.certificate]
 
-  create_duration = "60s"
+  create_duration = "15s"
 }

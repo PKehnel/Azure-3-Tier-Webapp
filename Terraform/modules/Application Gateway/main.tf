@@ -15,7 +15,7 @@ locals {
 }
 
 data "azurerm_key_vault" "vault" {
-  name                = "${local.naming_prefix}-keyvault-1"
+  name                = var.vault-name
   resource_group_name = local.resource_group_name
 }
 
@@ -29,7 +29,7 @@ data "azurerm_resource_group" "rg" {
 }
 
 data "azurerm_subnet" "subnet" {
-  name                 = "${local.naming_prefix}-subnet_${var.gateway_name}"
+  name                 = "${local.naming_prefix}-subnet_${var.app_gateway_name}"
   resource_group_name  = local.resource_group_name
   virtual_network_name = "${local.naming_prefix}-${var.vnet_name}"
 }
@@ -151,7 +151,7 @@ resource "azurerm_application_gateway" "appgw" {
 
 data "azurerm_network_interface" "nic_webservers" {
   count               = 2
-  name                = "webnic-${count.index}"
+  name                = "webnic-${count.index}-${var.webserver_name}"
   resource_group_name = local.resource_group_name
 }
 

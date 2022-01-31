@@ -3,6 +3,7 @@ variable "dbserver_count" {default = 1}
 variable "azure_region" { default = "westeurope" }
 variable "env" { default = "usecase3" }
 variable "stage" { default = "dev" }
+variable "vault-name" {}
 
 variable "virtual_server_name" { default = "webserver" }
 variable "vnet_name" { default = "vnet"}

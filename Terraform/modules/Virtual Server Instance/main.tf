@@ -80,7 +80,7 @@ resource "azurerm_virtual_machine" "virtual_servers" {
 # Create FrontEnd NICs for the webservers in the web subnet
 resource "azurerm_network_interface" "nic_webservers" {
   count               = var.virtual_server_count
-  name                = "webnic-${count.index}"
+  name                = "webnic-${count.index}-${var.virtual_server_name}"
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
 
@@ -124,7 +124,7 @@ resource "azurerm_virtual_machine_extension" "da_web" {
 }
 
 data "azurerm_key_vault" "vault" {
-  name                = "${local.naming_prefix}-keyvault-1"
+  name                = var.vault-name
   resource_group_name = local.resource_group_name
 }
 

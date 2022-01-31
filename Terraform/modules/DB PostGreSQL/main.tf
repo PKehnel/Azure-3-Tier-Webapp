@@ -14,7 +14,7 @@ data "azurerm_availability_set" "avset" {
 }
 
 data "azurerm_key_vault" "vault" {
-  name                = "${local.naming_prefix}-keyvault"
+  name                = var.vault-name
   resource_group_name = local.resource_group_name
 }
 

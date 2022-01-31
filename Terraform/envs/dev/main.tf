@@ -53,7 +53,8 @@ module "Application_Gateway" {
   env              = var.env
   app_gateway_name = var.app_gateway_name
   webserver_name   = var.webserver_name
-  depends_on       = [module.Vnet, module.Azure_Key_Vault, module.VSI_Webserver]
+  vault-name    = module.Azure_Key_Vault.vault_name
+  depends_on       = [module.Vnet, module.VSI_Webserver]
 }
 
 module "Bastion_Host" {
@@ -72,9 +73,9 @@ module "VSI_Webserver" {
   azure_region = var.azure_region
   stage        = var.stage
   env          = var.env
-
+  vault-name    = module.Azure_Key_Vault.vault_name
   virtual_server_name = var.webserver_name
-  depends_on          = [module.Vnet, module.Azure_Key_Vault]
+  depends_on          = [module.Vnet]
 }
 
 module "MySQL_PaaS" {
@@ -84,7 +85,8 @@ module "MySQL_PaaS" {
   stage        = var.stage
   env          = var.env
   mysql_name   = var.mysql_name
-  depends_on   = [module.Vnet, module.Azure_Key_Vault]
+  vault-name    = module.Azure_Key_Vault.vault_name
+  depends_on   = [module.Vnet]
 }
 
 module "VSI_DB" {
@@ -95,7 +97,8 @@ module "VSI_DB" {
   env                  = var.env
   virtual_server_name  = var.postGresSQL_name
   virtual_server_count = var.postGresSQL_db_count
-  depends_on           = [module.Vnet, module.Azure_Key_Vault]
+  vault-name    = module.Azure_Key_Vault.vault_name
+  depends_on           = [module.Vnet]
 }
 
 
