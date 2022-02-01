@@ -10,20 +10,15 @@ Terraform Script to provision an IaaS infrastructure in MS Azure
 ![Archhitecture Overview](Documentation/images/UC3-Architecture.jpg?raw=true "Architecture Overview")
 
 ---
-**Open Topics:** 
+**Open Topics:**
+- auswahl betriebsystem 
+- Kusto Queries zur Logauswertung (2-3)
 
-**Iteration 2:** 
-
+**On Hold**
 - Tagging (Example or do we add it to all?) (Policy tagging)
 - naming conventions (check all files if we missed names)
-
 - Test and Debug [https://www.hashicorp.com/blog/testing-hashicorp-terraform](https://www.hashicorp.com/blog/testing-hashicorp-terraform)
-- Refactor Variables as top part of each module is currently the same
 
-
-Parameter size machines
-auswahl betriebsystem
-Kusto Queries zur Logauswertung (2-3)
 
 ## Application Gateway vs "Classic" Load Balancer
 
