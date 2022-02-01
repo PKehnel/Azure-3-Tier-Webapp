@@ -1,0 +1,37 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- none
+
+pool:
+  name: Default
+
+jobs:
+- job: UseCase3
+  displayName: 'Destroy Use Case 3 Infra'
+
+  steps:
+  - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
+    displayName: Install Terraform
+
+  - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
+    displayName: 'Terraform : Init'
+    inputs:
+      provider: 'azurerm'
+      workingDirectory: '$(System.DefaultWorkingDirectory)\Terraform\envs\dev'
+      backendServiceArm: SC4TF
+      backendAzureRmResourceGroupName: 'tfstate'
+      backendAzureRmStorageAccountName: 'tfstate1459'
+      backendAzureRmContainerName: 'tfstate'
+      backendAzureRmKey: tf-uc3.tfstate
+
+  - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
+    displayName: 'Terraform : Destroy'
+    inputs:
+      command: destroy
+      workingDirectory: '$(System.DefaultWorkingDirectory)\Terraform\envs\dev'
+      environmentServiceNameAzureRM: SC4TF
+
