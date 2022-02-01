@@ -10,7 +10,7 @@ data "azurerm_resource_group" "rg" {
 
 #Create the subnet that holds the db-servers
 data "azurerm_subnet" "subnet" {
-  name                 = "${local.naming_prefix}-subnet_${var.subnet_name != null ? var.subnet_name :var.mysql_name}"
+  name                 = "${local.naming_prefix}-subnet_${var.subnet_name != null ? var.subnet_name : var.mysql_name}"
   resource_group_name  = local.resource_group_name
   virtual_network_name = "${local.naming_prefix}-${var.vnet_name}"
 }
@@ -21,9 +21,9 @@ data "azurerm_key_vault" "vault" {
 }
 
 resource "random_string" "random_suffix" {
-  length  = 4
-  special = false
-  lower = true
+  length    = 4
+  special   = false
+  lower     = true
   min_lower = 4
 }
 

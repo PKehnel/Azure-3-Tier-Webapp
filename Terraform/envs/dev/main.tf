@@ -73,7 +73,7 @@ module "VSI_Webserver" {
   azure_region        = var.azure_region
   stage               = var.stage
   env                 = var.env
-  vm_size = "Standard_DS1_v2"
+  vm_size             = "Standard_DS1_v2"
   vault_name          = module.Azure_Key_Vault.vault_name
   virtual_server_name = var.webserver_name
   depends_on          = [module.Vnet]
@@ -98,8 +98,8 @@ module "VSI_DB" {
   env                  = var.env
   virtual_server_name  = var.postGresSQL_name
   virtual_server_count = var.postGresSQL_db_count
-  subnet_name = var.mysql_name
-  script = "install-postgresql.sh"
+  subnet_name          = var.mysql_name
+  script               = "install-postgresql.sh"
   vault_name           = module.Azure_Key_Vault.vault_name
   depends_on           = [module.Vnet]
 }
