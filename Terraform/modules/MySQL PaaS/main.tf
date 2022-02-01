@@ -10,19 +10,27 @@ data "azurerm_resource_group" "rg" {
 
 #Create the subnet that holds the db-servers
 data "azurerm_subnet" "subnet" {
-  name                 = "${local.naming_prefix}-subnet_${var.mysql_name}"
+  name                 = "${local.naming_prefix}-subnet_${var.subnet_name != null ? var.subnet_name :var.mysql_name}"
   resource_group_name  = local.resource_group_name
   virtual_network_name = "${local.naming_prefix}-${var.vnet_name}"
 }
 
 data "azurerm_key_vault" "vault" {
-  name                = var.vault-name
+  name                = var.vault_name
   resource_group_name = local.resource_group_name
+}
+
+resource "random_string" "random_suffix" {
+  length  = 4
+  special = false
+  lower = true
+  min_lower = 4
 }
 
 # Create the mySQL database as PaaS service. Must be General Purpose SKU to be able to use Private Link service
 resource "azurerm_mysql_server" "mysql" {
-  name                = "${local.naming_prefix}-mysql"
+  # unique name is required
+  name                = "${local.naming_prefix}-mysql-${random_string.random_suffix.result}"
   location            = local.location
   resource_group_name = local.resource_group_name
 

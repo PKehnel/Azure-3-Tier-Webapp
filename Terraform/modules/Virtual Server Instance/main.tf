@@ -20,7 +20,7 @@ data "azurerm_log_analytics_workspace" "log_ws" {
 
 #Create the subnet that holds the web-servers
 data "azurerm_subnet" "subnet" {
-  name                 = "${local.naming_prefix}-subnet_${var.virtual_server_name}"
+  name                 = "${local.naming_prefix}-subnet_${var.subnet_name != null ? var.subnet_name : var.virtual_server_name}"
   resource_group_name  = local.resource_group_name
   virtual_network_name = "${local.naming_prefix}-${var.vnet_name}"
 }
@@ -42,7 +42,7 @@ resource "azurerm_virtual_machine" "virtual_servers" {
   resource_group_name   = data.azurerm_resource_group.rg.name
   availability_set_id   = azurerm_availability_set.avset.id
   network_interface_ids = [element(azurerm_network_interface.nic_webservers.*.id, count.index)]
-  vm_size               = "Standard_DS1_v2"
+  vm_size               = var.vm_size
 
   # Delete the OS disk automatically when deleting the VM
   delete_os_disk_on_termination = true
@@ -124,7 +124,7 @@ resource "azurerm_virtual_machine_extension" "da_web" {
 }
 
 data "azurerm_key_vault" "vault" {
-  name                = var.vault-name
+  name                = var.vault_name
   resource_group_name = local.resource_group_name
 }
 
