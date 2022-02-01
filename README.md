@@ -13,6 +13,7 @@ Terraform Script to provision an IaaS infrastructure in MS Azure
 **Open Topics:**
 - auswahl betriebsystem 
 - Kusto Queries zur Logauswertung (2-3)
+- add DB entry to display on Website
 
 **On Hold**
 - Tagging (Example or do we add it to all?) (Policy tagging)
