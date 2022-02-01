@@ -28,7 +28,7 @@ module "Vnet" {
       cidr                          = "10.0.3.0/24"
       disable_private_endpoint_only = true
     },
- ]
+  ]
 }
 
 module "Azure_Key_Vault" {
@@ -84,20 +84,5 @@ module "MySQL_PaaS" {
   vault_name   = module.Azure_Key_Vault.vault_name
   depends_on   = [module.Vnet]
 }
-
-module "VSI_DB" {
-  source = "../../modules/Virtual Server Instance"
-
-  azure_region         = var.azure_region
-  stage                = var.stage
-  env                  = var.env
-  virtual_server_name  = var.postGresSQL_name
-  virtual_server_count = var.postGresSQL_db_count
-  subnet_name          = var.mysql_name
-  script               = "install-postgresql.sh"
-  vault_name           = module.Azure_Key_Vault.vault_name
-  depends_on           = [module.Vnet]
-}
-
 
 
