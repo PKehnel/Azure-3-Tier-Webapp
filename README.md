@@ -1,7 +1,7 @@
 # uc3
 ![Terraform](https://img.shields.io/badge/terraform-%235835CC.svg?style=for-the-badge&logo=terraform&logoColor=white)
  
-Terraform Script to provision an IaaS infrastructure in MS Azure
+Terraform Module to provision IaaS  in MS Azure
 
 ---
 
@@ -9,24 +9,19 @@ Terraform Script to provision an IaaS infrastructure in MS Azure
 
 ![Archhitecture Overview](Documentation/images/UC3-Architecture.jpg?raw=true "Architecture Overview")
 
----
-**Open Topics:**
-- auswahl betriebsystem 
-- Kusto Queries zur Logauswertung (2-3)
-- add DB entry to display on Website
+## Documentation
 
-**On Hold**
-- Tagging (Example or do we add it to all?) (Policy tagging)
-- naming conventions (check all files if we missed names)
-- Test and Debug [https://www.hashicorp.com/blog/testing-hashicorp-terraform](https://www.hashicorp.com/blog/testing-hashicorp-terraform)
+### Basic usage
 
+- go the the [dev](Terraform/envs/dev) or [prod](Terraform/envs/prod) environment 
+- configure the main to your preference or use the standard config matching the above displayed usecase
+- run terraform commands: 
+  - `terraform init` 
+  - `terraform plan`
+  - `terraform apply`
 
-## Application Gateway vs "Classic" Load Balancer
+- when running the project with remote state file, configure via azure.conf and provider.tf
+- for pipeline usage see the [Documentation Folder](/Documentation).
 
-[Azure Application Gateway](https://docs.microsoft.com/en-us/azure/application-gateway/overview) is a web traffic load balancer that enables you to manage traffic to your web applications. (OSI Layer 7)
+For complete Documentation also see the [Documentation Folder](/Documentation).
 
-Traditional load balancers operate at the transport layer (OSI layer 4 - TCP and UDP) and route traffic based on source IP address and port, to a destination IP address and port.
-
-Advantage of Application gateway: 
-- easily integrate WAF
-- 80 / 443 ag perfect
