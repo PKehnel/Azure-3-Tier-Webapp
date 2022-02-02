@@ -1,0 +1,45 @@
+---
+- name: Usecase 3
+  hosts: all
+  become: yes
+  tasks:
+    - name: Include tasks for Ubuntu
+      include_tasks: ./play_inc_baseOS_Ubuntu.yaml
+      when: ansible_facts['distribution'] == "Ubuntu"
+
+    - name: Include tasks for RedHat
+      include_taks: ./play_inc_baseOS_RedHat.yaml
+      when: ansible_facts['os_family'] == "RedHat"
+
+    - name: Include tasks to manage webservers
+      include: ./play_inc_webservers.yaml
+
+    - name: Include task to handle user creation/removal and ssh key distribution
+      include: ./play_inc_users.yaml
+
+    - name: disable root login via ssh
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^PermitRootLogin'
+        line: "PermitRootLogin no"
+        state: present
+      notify:
+        - restart sshd
+
+    # Enable if you want to disable password auth completely and only have ssh key auth.
+    # - name: disable password authentication via ssh
+    #   lineinfile:
+    #     path: /etc/ssh/sshd_config
+    #     regexp: '^PasswordAuthentication'
+    #     line: "PasswordAuthentication no"
+    #     state: present
+    #   notify:
+    #     - restart sshd
+
+  handlers:
+  - name: restart sshd
+    service:
+      name: sshd
+      state: restarted
+
+# lock down root

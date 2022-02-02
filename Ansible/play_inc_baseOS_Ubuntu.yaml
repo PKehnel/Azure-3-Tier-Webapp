@@ -1,0 +1,13 @@
+---
+- name: Prep Ubuntu Base OS (updates and default packages)
+  include_tasks: play_inc_update_Ubuntu.yaml
+- name: Install Base packages on Ubuntu
+  apt:
+    name:
+      - git
+      - tmux
+      - tree
+      - vim
+    state: present
+    update_cache: yes
+...

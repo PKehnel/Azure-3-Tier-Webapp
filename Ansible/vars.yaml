@@ -1,0 +1,30 @@
+---
+user_list:
+  - ansible
+
+userdetails:
+  ansible:
+    password: '{{ ansible_pass }}'
+    name: 'Ansible User'
+    gecos: ''
+    state: present
+    group: ansible
+    sudo:
+      content: 'ansible ALL = (ALL) NOPASSWD: ALL'
+
+#  :
+#    password: '{{ _pass }}'
+#    email: ''
+#    name: ''
+#    gecos: ''
+#    group: ''
+#    groups:
+#      - group1
+#      - group2
+#    sudo: true
+#    sudo: false
+#    sudo:
+#      content: '<user> ALL = (ALL) ALL'
+#    sudo:
+#      src: '<FileReference>'
+...

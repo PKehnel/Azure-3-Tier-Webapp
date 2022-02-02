@@ -1,0 +1,19 @@
+---
+- name: Install dnf-utils on RedHat based systems to detect a needed reboot
+  dnf:
+    name:
+      - dnf-utils
+    state: latest
+    update_cache: yes
+- name: Prep RedHat/CentOS Base OS (updates and default packages)
+  include_tasks: play_inc_update_RedHat.yaml
+- name: Install Base packages on RedHat based systems
+  dnf:
+    name:
+      - git
+      - tmux
+      - tree
+      - vim
+    state: latest
+    update_cache: yes
+
