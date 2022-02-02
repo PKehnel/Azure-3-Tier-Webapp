@@ -7,7 +7,7 @@ variable "subnet_name" { default = null}
 
 
 variable "log_ws_name" { default = "loganalyticsWS"}
-variable "mysql_name" { default = "db" }
+variable "postGreSQL_name" { default = "db" }
 
 
 

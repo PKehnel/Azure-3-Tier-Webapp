@@ -8,5 +8,5 @@ variable "standard_tags" {
 variable "webserver_name" { default = "webserver" }
 variable "webserver_count" { default = 3 }
 variable "app_gateway_name" { default = "app-gateway" }
-variable "mysql_name" { default = "mysql_db" }
+variable "postGreSQL_name" { default = "postGreSQL_db" }
 variable "bastionhost_name" { default = "BastionHost" }

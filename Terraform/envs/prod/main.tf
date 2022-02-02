@@ -24,7 +24,7 @@ module "Vnet" {
     },
 
     {
-      name_suffix                   = var.mysql_name
+      name_suffix                   = var.postGreSQL_name
       cidr                          = "10.0.3.0/24"
       disable_private_endpoint_only = true
     },
@@ -74,13 +74,13 @@ module "VSI_Webserver" {
   depends_on          = [module.Vnet]
 }
 
-module "MySQL_PaaS" {
-  source = "../../modules/MySQL PaaS"
+module "PostGreSQL_PaaS" {
+  source = "../../modules/PostGreSQL PaaS"
 
   azure_region = var.azure_region
   stage        = var.stage
   env          = var.env
-  mysql_name   = var.mysql_name
+  postGreSQL_name   = var.postGreSQL_name
   vault_name   = module.Azure_Key_Vault.vault_name
   depends_on   = [module.Vnet]
 }
