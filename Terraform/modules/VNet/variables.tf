@@ -10,6 +10,7 @@ variable "standard_tags" {
   description = "Additional resource tags"
   type        = map(string)
 }
+
 variable "subnets" {
   description = "subnets"
   type        = list(object({

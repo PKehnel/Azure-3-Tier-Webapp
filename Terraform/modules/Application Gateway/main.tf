@@ -15,7 +15,7 @@ locals {
 }
 
 data "azurerm_key_vault" "vault" {
-  name                = var.vault-name
+  name                = var.vault_name
   resource_group_name = local.resource_group_name
 }
 
@@ -29,7 +29,7 @@ data "azurerm_resource_group" "rg" {
 }
 
 data "azurerm_subnet" "subnet" {
-  name                 = "${local.naming_prefix}-subnet_${var.app_gateway_name}"
+  name                 = "${local.naming_prefix}-subnet_${var.subnet_name != null ? var.subnet_name : var.app_gateway_name}"
   resource_group_name  = local.resource_group_name
   virtual_network_name = "${local.naming_prefix}-${var.vnet_name}"
 }
