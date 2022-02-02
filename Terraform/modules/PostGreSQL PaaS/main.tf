@@ -30,7 +30,7 @@ resource "random_string" "random_suffix" {
 # Create the mySQL database as PaaS service. Must be General Purpose SKU to be able to use Private Link service
 resource "azurerm_postgresql_server" "postGreSQL" {
   # unique name is required
-  name                = "${local.naming_prefix}-postGreSQL-${random_string.random_suffix.result}"
+  name                = "${local.naming_prefix}-postgresql-${random_string.random_suffix.result}"
   location            = local.location
   resource_group_name = local.resource_group_name
 
@@ -46,7 +46,8 @@ resource "azurerm_postgresql_server" "postGreSQL" {
   ssl_enforcement_enabled          = true
   ssl_minimal_tls_version_enforced = "TLS1_2"
 
-  administrator_login           = "${local.naming_prefix}-postGreSQL"
+  # Apparently hyphens ("-") are not allowed in the name.
+  administrator_login           = "${var.env}_${var.stage}_postgresql"
   administrator_login_password  = azurerm_key_vault_secret.postGreSQL_secret.value
 
 }

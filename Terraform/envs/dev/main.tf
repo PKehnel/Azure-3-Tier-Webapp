@@ -40,39 +40,39 @@ module "Azure_Key_Vault" {
   depends_on   = [module.Vnet, ]
 }
 
-#module "Application_Gateway" {
-#  source = "../../modules/Application Gateway"
-#
-#  azure_region     = var.azure_region
-#  stage            = var.stage
-#  env              = var.env
-#  app_gateway_name = var.app_gateway_name
-#  webserver_name   = var.webserver_name
-#  vault_name       = module.Azure_Key_Vault.vault_name
-#  depends_on       = [module.Vnet, module.VSI_Webserver]
-#}
-#
-#module "Bastion_Host" {
-#  source = "../../modules/Bastion Host"
-#
-#  azure_region     = var.azure_region
-#  stage            = var.stage
-#  env              = var.env
-#  bastionhost_name = var.bastionhost_name
-#  depends_on       = [module.Vnet, ]
-#}
-#
-#module "VSI_Webserver" {
-#  source = "../../modules/Virtual Server Instance"
-#
-#  azure_region        = var.azure_region
-#  stage               = var.stage
-#  env                 = var.env
-#  vm_size             = "Standard_DS1_v2"
-#  vault_name          = module.Azure_Key_Vault.vault_name
-#  virtual_server_name = var.webserver_name
-#  depends_on          = [module.Vnet]
-#}
+module "Application_Gateway" {
+  source = "../../modules/Application Gateway"
+
+  azure_region     = var.azure_region
+  stage            = var.stage
+  env              = var.env
+  app_gateway_name = var.app_gateway_name
+  webserver_name   = var.webserver_name
+  vault_name       = module.Azure_Key_Vault.vault_name
+  depends_on       = [module.Vnet, module.VSI_Webserver]
+}
+
+module "Bastion_Host" {
+  source = "../../modules/Bastion Host"
+
+  azure_region     = var.azure_region
+  stage            = var.stage
+  env              = var.env
+  bastionhost_name = var.bastionhost_name
+  depends_on       = [module.Vnet, ]
+}
+
+module "VSI_Webserver" {
+  source = "../../modules/Virtual Server Instance"
+
+  azure_region        = var.azure_region
+  stage               = var.stage
+  env                 = var.env
+  vm_size             = "Standard_DS1_v2"
+  vault_name          = module.Azure_Key_Vault.vault_name
+  virtual_server_name = var.webserver_name
+  depends_on          = [module.Vnet]
+}
 
 module "PostGreSQL_PaaS" {
   source = "../../modules/PostGreSQL PaaS"
