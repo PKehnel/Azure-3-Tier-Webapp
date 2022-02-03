@@ -48,10 +48,10 @@ resource "azurerm_virtual_machine" "virtual_servers" {
   delete_os_disk_on_termination = true
 
   storage_image_reference {
-    publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "18.04-LTS"
-    version   = "latest"
+    publisher = var.vm_image.publisher
+    offer     = var.vm_image.offer
+    sku       = var.vm_image.sku
+    version   = var.vm_image.version
   }
 
   storage_os_disk {
