@@ -7,7 +7,7 @@ trigger:
 - master
 
 pool:
-  name: Default
+  vmImage: windows-latest
 
 
 jobs:
