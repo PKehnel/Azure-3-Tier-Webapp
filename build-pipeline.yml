@@ -7,7 +7,7 @@ trigger:
 - master
 
 pool:
-  vmImage: windows-latest
+  name: Default
 
 
 jobs:
@@ -16,9 +16,7 @@ jobs:
 
   steps:
   - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
-    displayName: 'Install Terraform 1.1.4'
-    inputs:
-      terraformVersion: 1.1.4
+    displayName: Install Terraform
 
   - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
     displayName: 'Terraform : Init'
