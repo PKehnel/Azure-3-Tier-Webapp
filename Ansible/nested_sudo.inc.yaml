@@ -1,0 +1,27 @@
+---
+    - name: set default sudo template if not specified
+      set_fact:
+        sudo_default: "{{ myuser }} ALL = (ALL) ALL"
+      when: userdetails[myuser].sudo is defined and userdetails[myuser].sudo and userdetails[myuser].sudo.src is not defined and userdetails[myuser].sudo.content is not defined
+  
+    - name: Setup sudo via content (inner loop)
+      copy:
+        dest: "/etc/sudoers.d/{{myuser}}"
+        content: "{{ userdetails[myuser].sudo.content |default(sudo_default) }}"
+        owner: root
+        group: root
+        mode: 0644
+        force: yes
+      when: userdetails[myuser].sudo is defined and userdetails[myuser].sudo and userdetails[myuser].sudo.src is not defined
+
+    - name: Setup sudo via file reference(inner loop)
+      copy:
+        dest: "/etc/sudoers.d/{{ userdetails[myuser].sudo.src|basename | default(myuser) }}"
+        src: "{{ userdetails[myuser].sudo.src |default(omit) }}"
+        owner: root
+        group: root
+        mode: 0644
+        force: yes
+      when: userdetails[myuser].sudo is defined and userdetails[myuser].sudo.src is defined
+
+...

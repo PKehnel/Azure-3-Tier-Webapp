@@ -1,0 +1,23 @@
+---
+- name: Ensure needed groups do exist (outer loop)
+  include_tasks: nested_groups.inc.yaml
+  when: userdetails[myuser] is defined
+  with_list: "{{ user_list }}"
+  loop_control:
+    loop_var: myuser
+
+- name: create user(s)
+  user:
+    name: "{{item}}"
+    password: '{{ userdetails[item].password is match("\$6\$.*") | ternary(userdetails[item].password, userdetails[item].password | password_hash("sha512")) }}'
+    shell: "{{userdetails[item].shell | default(omit) }}"
+    uid: "{{userdetails[item].uid | default(omit) }}"
+    group: "{{userdetails[item].group |default(omit) }}"
+    groups: "{{userdetails[item].groups | default(omit) }}"
+    comment: "{{userdetails[item].gecos | default(omit) }}"
+    update_password: on_create
+    state: "{{ userdetails[item].state |default( 'present' ) }}"
+  when: userdetails[item] is defined
+  with_list: "{{ user_list }}"
+
+...

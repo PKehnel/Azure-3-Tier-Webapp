@@ -1,0 +1,15 @@
+---
+- name: install nginx
+  package:
+    name: nginx
+    state: present
+- name: ensure NGINX is enabled and running
+  systemd:
+    name: nginx
+    enabled: yes
+    masked: no
+    state: started
+- name: deploy index.html
+  template:
+    src: ./index.html.j2
+    dest: /var/www/html/index.html

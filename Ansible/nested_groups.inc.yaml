@@ -1,0 +1,16 @@
+---
+    - name: Ensure needed primary groups do exist (inner loop)
+      group:
+        name: "{{ userdetails[myuser].group }}"
+        state: present
+      when: (userdetails[myuser].group is defined) and (userdetails[myuser].group|length > 0)
+
+    - name: Ensure additionally needed groups do exist (inner loop)
+      group:
+        name: "{{ mygroups }}"
+        state: present
+      when: (mygroups is defined) and (mygroups|length > 0)
+      with_list: "{{ userdetails[myuser].groups }}"
+      loop_control:
+        loop_var: mygroups
+...
