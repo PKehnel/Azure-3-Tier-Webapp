@@ -18,3 +18,16 @@ variable "vm_size" {
   # https://docs.microsoft.com/en-gb/azure/virtual-machines/vm-naming-conventions
   default     = "Standard_DS1_v2"
 }
+
+variable "vm_image" {
+  description = "Define the OS (publisher, offer, sku, version)"
+  # Publisher: Ubuntu → Canonical; RedHat → RedHat; CentOS → OpenLogic; SuSE Linux → SUSE; Debian → credativ; Oracle Linux → Oracle-Linux; CoreOS → CoreOS
+  # The other 3 attributes can be found via:
+  # az vm image list -f *Publisher_Name* --all
+  default = {
+    "publisher" = "Canonical"
+    "offer" = "UbuntuServer"
+    "sku" = "18.04-LTS"
+    "version" = "latest"
+  }
+}

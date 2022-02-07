@@ -28,7 +28,7 @@ module "Vnet" {
       cidr                          = "10.0.3.0/24"
       disable_private_endpoint_only = true
     },
- ]
+  ]
 }
 
 module "Azure_Key_Vault" {
@@ -77,12 +77,12 @@ module "VSI_Webserver" {
 module "PostGreSQL_PaaS" {
   source = "../../modules/PostGreSQL PaaS"
 
-  azure_region = var.azure_region
-  stage        = var.stage
-  env          = var.env
-  postGreSQL_name   = var.postGreSQL_name
-  vault_name   = module.Azure_Key_Vault.vault_name
-  depends_on   = [module.Vnet]
+  azure_region    = var.azure_region
+  stage           = var.stage
+  env             = var.env
+  postGreSQL_name = var.postGreSQL_name
+  vault_name      = module.Azure_Key_Vault.vault_name
+  depends_on      = [module.Vnet]
 }
 
 
