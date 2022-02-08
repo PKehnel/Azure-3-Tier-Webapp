@@ -51,16 +51,16 @@ module "Application_Gateway" {
   vault_name       = module.Azure_Key_Vault.vault_name
   depends_on       = [module.Vnet, module.VSI_Webserver]
 }
-
-module "Bastion_Host" {
-  source = "../../modules/Bastion Host"
-
-  azure_region     = var.azure_region
-  stage            = var.stage
-  env              = var.env
-  bastionhost_name = var.bastionhost_name
-  depends_on       = [module.Vnet, ]
-}
+#
+#module "Bastion_Host" {
+#  source = "../../modules/Bastion Host"
+#
+#  azure_region     = var.azure_region
+#  stage            = var.stage
+#  env              = var.env
+#  bastionhost_name = var.bastionhost_name
+#  depends_on       = [module.Vnet, ]
+#}
 
 module "VSI_Webserver" {
   source = "../../modules/Virtual Server Instance"
@@ -74,16 +74,16 @@ module "VSI_Webserver" {
   depends_on          = [module.Vnet]
 }
 
-module "PostGreSQL_PaaS" {
-  source = "../../modules/PostGreSQL PaaS"
-
-  azure_region    = var.azure_region
-  stage           = var.stage
-  env             = var.env
-  postGreSQL_name = var.postGreSQL_name
-  vault_name      = module.Azure_Key_Vault.vault_name
-  depends_on      = [module.Vnet]
-}
+#module "PostGreSQL_PaaS" {
+#  source = "../../modules/PostGreSQL PaaS"
+#
+#  azure_region    = var.azure_region
+#  stage           = var.stage
+#  env             = var.env
+#  postGreSQL_name = var.postGreSQL_name
+#  vault_name      = module.Azure_Key_Vault.vault_name
+#  depends_on      = [module.Vnet]
+#}
 
 
 # PostgreSQL DB could also be setup via VSI with a install script
