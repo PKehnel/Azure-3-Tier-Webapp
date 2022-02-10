@@ -71,10 +71,14 @@ resource "azurerm_virtual_machine" "virtual_servers" {
   os_profile_linux_config {
     disable_password_authentication = false
   }
-
+  identity  {
+    type = "SystemAssigned"
+  }
   tags = {
     environment = "uc3-demo"
   }
+
+
 }
 
 # Create FrontEnd NICs for the webservers in the web subnet

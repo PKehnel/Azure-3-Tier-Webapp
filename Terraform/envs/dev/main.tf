@@ -51,16 +51,16 @@ module "Application_Gateway" {
   vault_name       = module.Azure_Key_Vault.vault_name
   depends_on       = [module.Vnet, module.VSI_Webserver]
 }
-#
-#module "Bastion_Host" {
-#  source = "../../modules/Bastion Host"
-#
-#  azure_region     = var.azure_region
-#  stage            = var.stage
-#  env              = var.env
-#  bastionhost_name = var.bastionhost_name
-#  depends_on       = [module.Vnet, ]
-#}
+
+module "Bastion_Host" {
+  source = "../../modules/Bastion Host"
+
+  azure_region     = var.azure_region
+  stage            = var.stage
+  env              = var.env
+  bastionhost_name = var.bastionhost_name
+  depends_on       = [module.Vnet, ]
+}
 
 module "VSI_Webserver" {
   source = "../../modules/Virtual Server Instance"
