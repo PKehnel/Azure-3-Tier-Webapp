@@ -1,11 +1,10 @@
 locals {
-  naming_prefix       = "${var.env}-${var.stage}"
-  location            = data.azurerm_resource_group.rg.location
-  resource_group_name = data.azurerm_resource_group.rg.name
+  naming_prefix = "${var.env}-${var.stage}"
+  location      = data.azurerm_resource_group.rg.location
 }
 
 data "azurerm_resource_group" "rg" {
-  name = "${local.naming_prefix}-rg"
+  name = var.resource_group_name
 }
 
 data "template_file" "nginx_vm_cloud_init" {
@@ -14,22 +13,20 @@ data "template_file" "nginx_vm_cloud_init" {
 
 data "azurerm_log_analytics_workspace" "log_ws" {
   name                = "${local.naming_prefix}-${var.log_ws_name}"
-  resource_group_name = local.resource_group_name
+  resource_group_name = var.resource_group_name
 }
 
-
-#Create the subnet that holds the web-servers
 data "azurerm_subnet" "subnet" {
   name                 = "${local.naming_prefix}-subnet_${var.subnet_name != null ? var.subnet_name : var.virtual_server_name}"
-  resource_group_name  = local.resource_group_name
-  virtual_network_name = "${local.naming_prefix}-${var.vnet_name}"
+  resource_group_name  = var.resource_group_name
+  virtual_network_name = var.virtual_network_name
 }
 
 #Create an availability set with two fault/update domains, so each webserver is placed into its own domain
 resource "azurerm_availability_set" "avset" {
   name                         = "${local.naming_prefix}-${var.virtual_server_name}-avset"
-  location                     = data.azurerm_resource_group.rg.location
-  resource_group_name          = data.azurerm_resource_group.rg.name
+  resource_group_name          = var.resource_group_name
+  location                     = local.location
   platform_fault_domain_count  = 2
   platform_update_domain_count = 2
   managed                      = true
@@ -38,8 +35,8 @@ resource "azurerm_availability_set" "avset" {
 resource "azurerm_virtual_machine" "virtual_servers" {
   count                 = var.virtual_server_count
   name                  = "${local.naming_prefix}-${var.virtual_server_name}-${count.index}"
-  location              = data.azurerm_resource_group.rg.location
-  resource_group_name   = data.azurerm_resource_group.rg.name
+  location              = local.location
+  resource_group_name   = var.resource_group_name
   availability_set_id   = azurerm_availability_set.avset.id
   network_interface_ids = [element(azurerm_network_interface.nic_webservers.*.id, count.index)]
   vm_size               = var.vm_size
@@ -71,22 +68,20 @@ resource "azurerm_virtual_machine" "virtual_servers" {
   os_profile_linux_config {
     disable_password_authentication = false
   }
-  identity  {
+  identity {
     type = "SystemAssigned"
   }
   tags = {
     environment = "uc3-demo"
   }
-
-
 }
 
 # Create FrontEnd NICs for the webservers in the web subnet
 resource "azurerm_network_interface" "nic_webservers" {
   count               = var.virtual_server_count
-  name                = "webnic-${count.index}-${var.virtual_server_name}"
-  location            = data.azurerm_resource_group.rg.location
-  resource_group_name = data.azurerm_resource_group.rg.name
+  name                = "webnic-${local.naming_prefix}-${var.virtual_server_name}-${count.index}"
+  location            = local.location
+  resource_group_name = var.resource_group_name
 
   ip_configuration {
     name                          = "IPConfiguration"
@@ -129,7 +124,7 @@ resource "azurerm_virtual_machine_extension" "da_web" {
 
 data "azurerm_key_vault" "vault" {
   name                = var.vault_name
-  resource_group_name = local.resource_group_name
+  resource_group_name = var.resource_group_name
 }
 
 

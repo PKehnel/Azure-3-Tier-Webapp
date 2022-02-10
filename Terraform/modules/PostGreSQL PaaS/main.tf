@@ -5,19 +5,19 @@ locals {
 }
 
 data "azurerm_resource_group" "rg" {
-  name = "${local.naming_prefix}-rg"
+  name = var.resource_group_name
 }
 
 #Create the subnet that holds the db-servers
 data "azurerm_subnet" "subnet" {
   name                 = "${local.naming_prefix}-subnet_${var.subnet_name != null ? var.subnet_name : var.postGreSQL_name}"
-  resource_group_name  = local.resource_group_name
+  resource_group_name  = var.resource_group_name
   virtual_network_name = "${local.naming_prefix}-${var.vnet_name}"
 }
 
 data "azurerm_key_vault" "vault" {
   name                = var.vault_name
-  resource_group_name = local.resource_group_name
+  resource_group_name = var.resource_group_name
 }
 
 resource "random_string" "random_suffix" {
@@ -32,7 +32,7 @@ resource "azurerm_postgresql_server" "postGreSQL" {
   # unique name is required
   name                = "${local.naming_prefix}-postgresql-${random_string.random_suffix.result}"
   location            = local.location
-  resource_group_name = local.resource_group_name
+  resource_group_name = var.resource_group_name
 
   sku_name   = "GP_Gen5_4"
   version    = "9.6"
@@ -56,7 +56,7 @@ resource "azurerm_postgresql_server" "postGreSQL" {
 resource "azurerm_private_endpoint" "ep_postGreSQL" {
   name                = "${local.naming_prefix}-postGreSQL-endpoint"
   location            = local.location
-  resource_group_name = local.resource_group_name
+  resource_group_name = var.resource_group_name
   subnet_id           = data.azurerm_subnet.subnet.id
 
   private_service_connection {

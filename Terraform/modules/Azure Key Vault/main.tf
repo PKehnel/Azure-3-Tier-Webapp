@@ -1,11 +1,10 @@
 locals {
-  naming_prefix       = "${var.env}-${var.stage}"
-  location            = data.azurerm_resource_group.rg.location
-  resource_group_name = data.azurerm_resource_group.rg.name
+  naming_prefix = "${var.env}-${var.stage}"
+  location      = data.azurerm_resource_group.rg.location
 }
 
 data "azurerm_resource_group" "rg" {
-  name = "${local.naming_prefix}-rg"
+  name = var.resource_group_name
 }
 
 data "azurerm_client_config" "current" {}
@@ -19,7 +18,7 @@ resource "azurerm_key_vault" "vault" {
   # Vault names are globaly unique and max 24 chars, so add random string
   name                       = "${local.naming_prefix}-KV-${random_string.random_suffix.result}"
   location                   = local.location
-  resource_group_name        = local.resource_group_name
+  resource_group_name        = var.resource_group_name
   tenant_id                  = data.azurerm_client_config.current.tenant_id
   soft_delete_retention_days = 90
   purge_protection_enabled   = false
@@ -51,7 +50,7 @@ resource "azurerm_key_vault" "vault" {
 
 # Create a self signed certificate
 resource "azurerm_key_vault_certificate" "certificate" {
-  name         = "${local.naming_prefix}-cert-${var.webserver_name}"
+  name         = "${local.naming_prefix}-cert"
   key_vault_id = azurerm_key_vault.vault.id
 
   certificate_policy {
@@ -106,7 +105,7 @@ resource "azurerm_key_vault_certificate" "certificate" {
 
 resource "azurerm_user_assigned_identity" "agw" {
   location            = local.location
-  resource_group_name = local.resource_group_name
+  resource_group_name = var.resource_group_name
   name                = "agw-msi"
 }
 

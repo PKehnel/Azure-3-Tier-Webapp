@@ -30,4 +30,8 @@ sudo apt-get update && sudo apt-get install telegraf
 telegraf --input-filter cpu:mem:nginx --output-filter azure_monitor config > azm-telegraf.conf
 sudo cp azm-telegraf.conf /etc/telegraf/telegraf.conf
 
-sudo vi /etc/nginx/sites-enabled/default
+### TODO ####  sudo vi /etc/nginx/sites-enabled/default write line: location /server_status {stub_status on;access_log off;allow all;} in server block
+
+
+sudo systemctl stop telegraf
+sudo systemctl start telegraf
