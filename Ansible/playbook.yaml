@@ -36,6 +36,9 @@
     #   notify:
     #     - restart sshd
 
+    - name: configure Telegraf
+      include: ./play_inc_telegraf.yaml
+
   handlers:
   - name: restart sshd
     service:
