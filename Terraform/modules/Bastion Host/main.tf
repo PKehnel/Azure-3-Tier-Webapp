@@ -1,6 +1,5 @@
 locals {
   naming_prefix       = "${var.env}-${var.stage}"
-  resource_group_name = data.azurerm_resource_group.rg.name
   location            = data.azurerm_resource_group.rg.location
 }
 
@@ -11,7 +10,7 @@ data "azurerm_resource_group" "rg" {
 # Create the subnet that holds the for the bastion service
 data "azurerm_subnet" "subnet" {
   name                 = "AzureBastionSubnet" # This name is predefined by Azure
-  resource_group_name  = local.resource_group_name
+  resource_group_name  = var.resource_group_name
   virtual_network_name = var.virtual_network_name
 }
 
@@ -19,7 +18,7 @@ data "azurerm_subnet" "subnet" {
 resource "azurerm_public_ip" "pip_bastion" {
   name                = "publicIPForBastion"
   location            = local.location
-  resource_group_name = local.resource_group_name
+  resource_group_name = var.resource_group_name
   allocation_method   = "Static"
   sku                 = "Standard"
 }
@@ -28,7 +27,7 @@ resource "azurerm_public_ip" "pip_bastion" {
 resource "azurerm_bastion_host" "bastion" {
   name                = "${local.naming_prefix}-${var.bastionhost_name}"
   location            = local.location
-  resource_group_name = local.resource_group_name
+  resource_group_name = var.resource_group_name
 
   ip_configuration {
     name                 = "IPConfiguration"

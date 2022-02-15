@@ -28,6 +28,11 @@ module "Vnet" {
       cidr                          = "10.0.3.0/24"
       disable_private_endpoint_only = true
     },
+    {
+      name_suffix                   = "ansible"
+      cidr                          = "10.0.3.0/24"
+      disable_private_endpoint_only = true
+    }
   ]
 }
 
@@ -37,11 +42,13 @@ module "Azure_Key_Vault" {
   azure_region = var.azure_region
   stage        = var.stage
   env          = var.env
+  webserver_name = var.webserver_name
 
   resource_group_name  = module.Vnet.resource_group_name
   virtual_network_name = module.Vnet.vnet_name
 
   depends_on = [module.Vnet]
+
 }
 
 
@@ -65,6 +72,21 @@ module "VSI_Webserver" {
   env                 = var.env
   vm_size             = "Standard_DS1_v2"
   virtual_server_name = var.webserver_name
+
+  vault_name           = module.Azure_Key_Vault.vault_name
+  resource_group_name  = module.Vnet.resource_group_name
+  virtual_network_name = module.Vnet.vnet_name
+
+  depends_on = [module.Vnet]
+}
+
+module "Ansible" {
+  source = "../../modules/Virtual Server Instance"
+
+  stage               = var.stage
+  env                 = var.env
+  vm_size             = "Standard_DS1_v2"
+  virtual_server_name = "Ansible"
 
   vault_name           = module.Azure_Key_Vault.vault_name
   resource_group_name  = module.Vnet.resource_group_name
