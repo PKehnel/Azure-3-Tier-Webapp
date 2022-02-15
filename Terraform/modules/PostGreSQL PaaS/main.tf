@@ -11,7 +11,7 @@ data "azurerm_resource_group" "rg" {
 data "azurerm_subnet" "subnet" {
   name                 = "${local.naming_prefix}-subnet_${var.subnet_name != null ? var.subnet_name : var.postGreSQL_name}"
   resource_group_name  = var.resource_group_name
-  virtual_network_name = "${local.naming_prefix}-${var.vnet_name}"
+  virtual_network_name = var.virtual_network_name
 }
 
 data "azurerm_key_vault" "vault" {

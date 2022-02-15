@@ -2,15 +2,15 @@ locals {
   naming_prefix = "${var.env}-${var.stage}"
   location      = data.azurerm_resource_group.rg.location
 
-  backend_address_pool_name      = "${local.naming_prefix}-${var.vnet_name}-beap"
-  frontend_port_name             = "${local.naming_prefix}-${var.vnet_name}-feport"
-  frontend_ip_configuration_name = "${local.naming_prefix}-${var.vnet_name}-feip"
-  http_setting_name              = "${local.naming_prefix}-${var.vnet_name}-be-htst"
-  https_setting_name             = "${local.naming_prefix}-${var.vnet_name}-be-httpsst"
-  listener_name_http             = "${local.naming_prefix}-${var.vnet_name}-httplstn"
-  listener_name_https            = "${local.naming_prefix}-${var.vnet_name}-httpslstn"
-  request_routing_rule_name      = "${local.naming_prefix}-${var.vnet_name}-rqrt"
-  redirect_configuration_name    = "${local.naming_prefix}-${var.vnet_name}-rdrcfg"
+  backend_address_pool_name      = "${local.naming_prefix}-${var.virtual_network_name}-beap"
+  frontend_port_name             = "${local.naming_prefix}-${var.virtual_network_name}-feport"
+  frontend_ip_configuration_name = "${local.naming_prefix}-${var.virtual_network_name}-feip"
+  http_setting_name              = "${local.naming_prefix}-${var.virtual_network_name}-be-htst"
+  https_setting_name             = "${local.naming_prefix}-${var.virtual_network_name}-be-httpsst"
+  listener_name_http             = "${local.naming_prefix}-${var.virtual_network_name}-httplstn"
+  listener_name_https            = "${local.naming_prefix}-${var.virtual_network_name}-httpslstn"
+  request_routing_rule_name      = "${local.naming_prefix}-${var.virtual_network_name}-rqrt"
+  redirect_configuration_name    = "${local.naming_prefix}-${var.virtual_network_name}-rdrcfg"
 }
 
 data "azurerm_key_vault" "vault" {
@@ -30,7 +30,7 @@ data "azurerm_resource_group" "rg" {
 data "azurerm_subnet" "subnet" {
   name                 = "${local.naming_prefix}-subnet_${var.subnet_name != null ? var.subnet_name : var.app_gateway_name}"
   resource_group_name  = var.resource_group_name
-  virtual_network_name = "${local.naming_prefix}-${var.vnet_name}"
+  virtual_network_name = var.virtual_network_name
 }
 
 

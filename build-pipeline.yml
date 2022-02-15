@@ -8,6 +8,8 @@ trigger:
 
 pool:
   name: Default
+  #replace with
+  #vmImage: windows-latest
 
 
 jobs:
@@ -25,7 +27,7 @@ jobs:
       workingDirectory: '$(System.DefaultWorkingDirectory)\Terraform\envs\dev'
       backendServiceArm: SC4TF
       backendAzureRmResourceGroupName: 'tfstate'
-      backendAzureRmStorageAccountName: 'tfstate1459'
+      backendAzureRmStorageAccountName: 'tfstatevxkmm' # This needs to be replaced to match the generated name
       backendAzureRmContainerName: 'tfstate'
       backendAzureRmKey: tf-uc3.tfstate
 

@@ -30,7 +30,7 @@ module "Vnet" {
     },
     {
       name_suffix                   = "ansible"
-      cidr                          = "10.0.3.0/24"
+      cidr                          = "10.0.4.0/24"
       disable_private_endpoint_only = true
     }
   ]
@@ -39,7 +39,6 @@ module "Vnet" {
 module "Azure_Key_Vault" {
   source = "../../modules/Azure Key Vault"
 
-  azure_region = var.azure_region
   stage        = var.stage
   env          = var.env
   webserver_name = var.webserver_name
@@ -86,7 +85,8 @@ module "Ansible" {
   stage               = var.stage
   env                 = var.env
   vm_size             = "Standard_DS1_v2"
-  virtual_server_name = "Ansible"
+  virtual_server_name = "ansible"
+  virtual_server_count = 1
 
   vault_name           = module.Azure_Key_Vault.vault_name
   resource_group_name  = module.Vnet.resource_group_name
@@ -95,34 +95,34 @@ module "Ansible" {
   depends_on = [module.Vnet]
 }
 
-module "Application_Gateway" {
-  source = "../../modules/Application Gateway"
+#module "Application_Gateway" {
+#  source = "../../modules/Application Gateway"
+#
+#  stage            = var.stage
+#  env              = var.env
+#  app_gateway_name = var.app_gateway_name
+#
+#  webserver_name       = module.VSI_Webserver.virtual_server_name
+#  vault_name           = module.Azure_Key_Vault.vault_name
+#  resource_group_name  = module.Vnet.resource_group_name
+#  virtual_network_name = module.Vnet.vnet_name
+#
+#  depends_on = [module.Vnet, module.Azure_Key_Vault]
+#}
 
-  stage            = var.stage
-  env              = var.env
-  app_gateway_name = var.app_gateway_name
-
-  webserver_name       = module.VSI_Webserver.virtual_server_name
-  vault_name           = module.Azure_Key_Vault.vault_name
-  resource_group_name  = module.Vnet.resource_group_name
-  virtual_network_name = module.Vnet.vnet_name
-
-  depends_on = [module.Vnet, module.Azure_Key_Vault]
-}
-
-module "PostGreSQL_PaaS" {
-  source = "../../modules/PostGreSQL PaaS"
-
-  stage           = var.stage
-  env             = var.env
-  postGreSQL_name = var.postGreSQL_name
-  vault_name      = module.Azure_Key_Vault.vault_name
-
-  resource_group_name  = module.Vnet.resource_group_name
-  virtual_network_name = module.Vnet.vnet_name
-
-  depends_on = [module.Vnet]
-}
+#module "PostGreSQL_PaaS" {
+#  source = "../../modules/PostGreSQL PaaS"
+#
+#  stage           = var.stage
+#  env             = var.env
+#  postGreSQL_name = var.postGreSQL_name
+#  vault_name      = module.Azure_Key_Vault.vault_name
+#
+#  resource_group_name  = module.Vnet.resource_group_name
+#  virtual_network_name = module.Vnet.vnet_name
+#
+#  depends_on = [module.Vnet]
+#}
 
 
 # PostgreSQL DB could also be setup via VSI with a install script

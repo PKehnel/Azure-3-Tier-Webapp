@@ -67,7 +67,12 @@ resource "azurerm_virtual_machine" "virtual_servers" {
 
   os_profile_linux_config {
     disable_password_authentication = false
+    ssh_keys {
+      key_data = tls_private_key.ssh_key.public_key_openssh
+      path     = "/home/${var.virtual_server_name}-${count.index}/.ssh/authorized_keys"
+    }
   }
+
   identity {
     type = "SystemAssigned"
   }
@@ -142,3 +147,17 @@ resource "azurerm_key_vault_secret" "virtual_server_secret" {
   value        = random_string.virtual_server_password.result
   key_vault_id = data.azurerm_key_vault.vault.id
 }
+
+# Create (and display) an SSH key
+resource "tls_private_key" "ssh_key" {
+  algorithm = "RSA"
+  rsa_bits = 4096
+}
+
+resource "azurerm_key_vault_secret" "private_ssh_key" {
+  name         = "${local.naming_prefix}-private-ssh-key-${var.virtual_server_name}"
+  value        = tls_private_key.ssh_key.private_key_pem
+  key_vault_id = data.azurerm_key_vault.vault.id
+}
+
+
