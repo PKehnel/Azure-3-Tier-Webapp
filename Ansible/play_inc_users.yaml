@@ -20,4 +20,19 @@
   when: userdetails[item] is defined
   with_list: "{{ user_list }}"
 
+- name: Ensure authorized_keys files are in place
+  authorized_key:
+    user: "{{item}}"
+    state: present
+    key: "{{ sshkeys[item] |map(attribute='sshkey')|join('\n') }}"
+  when: sshkeys[item] is defined
+  with_list: "{{ user_list }}"
+
+- name: Setup sudo (outer loop)
+  include_tasks: nested_sudo.inc.yaml
+  when: userdetails[myuser] is defined
+  with_list: "{{ user_list }}"
+  loop_control:
+    loop_var: myuser
+
 ...

@@ -7,12 +7,12 @@
     - vars.yaml
     - vault.yaml
   tasks:
-    - name: Include tasks for Ubuntu
+    - name: Include tasks for Debian/Ubuntu
       include_tasks: ./play_inc_baseOS_Ubuntu.yaml
       when: ansible_facts['os_family'] == "Debian"
 
-    - name: Include tasks for RedHat
-      include_tasks: ./play_inc_baseOS_RedHat.yaml
+    - name: Include tasks for RedHat/CentOS
+      include_taks: ./play_inc_baseOS_RedHat.yaml
       when: ansible_facts['os_family'] == "RedHat"
 
     - name: Include tasks to manage webservers
@@ -39,6 +39,9 @@
     #     state: present
     #   notify:
     #     - restart sshd
+
+    - name: configure Telegraf
+      include: ./play_inc_telegraf.yaml
 
   handlers:
   - name: restart sshd
