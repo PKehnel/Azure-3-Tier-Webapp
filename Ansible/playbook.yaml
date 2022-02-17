@@ -12,7 +12,7 @@
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Include tasks for RedHat/CentOS
-      include_taks: ./play_inc_baseOS_RedHat.yaml
+      include_tasks: ./play_inc_baseOS_RedHat.yaml
       when: ansible_facts['os_family'] == "RedHat"
 
     - name: Include tasks to manage webservers
