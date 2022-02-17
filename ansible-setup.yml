@@ -13,6 +13,6 @@ steps:
 - task: ms-vscs-rm.vss-services-ansible.ansible-task.Ansible@0
   displayName: 'Run playbook'
   inputs:
-    playbookPathOnAgentMachine: '$(System.DefaultWorkingDirectory)/Ansible/playbook_ping.yaml'
+    playbookPathOnAgentMachine: '$(System.DefaultWorkingDirectory)/Ansible/playbook.yaml'
     inventoriesAgentMachine: file
     inventoryFileOnAgentMachine: '$(System.DefaultWorkingDirectory)/Ansible/inventory_azure_rm.yaml'

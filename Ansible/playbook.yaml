@@ -1,6 +1,6 @@
 ---
 - name: Usecase 3
-  hosts: all
+  hosts: Ubuntu
   become: yes
   vars_files:
     - vars.yaml
