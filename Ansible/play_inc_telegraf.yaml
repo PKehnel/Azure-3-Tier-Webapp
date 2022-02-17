@@ -35,7 +35,7 @@
 
     - name: debug
       debug:
-        msg: deb https://repos.influxdata.com/{{ ansible_facts['lsb']['id'] }} {{ ansible_facts['lsb']['codename'] }} stable
+        msg: deb https://repos.influxdata.com/{{ ansible_facts['lsb']['id']|lower }} {{ ansible_facts['lsb']['codename'] }} stable
 
     - name: Add sources.list file
       apt_repository:
