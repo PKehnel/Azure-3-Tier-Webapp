@@ -39,7 +39,7 @@
 
     - name: Add sources.list file
       apt_repository:
-        repo: deb https://repos.influxdata.com/{{ ansible_facts['lsb']['id'] }} {{ ansible_facts['lsb']['codename'] }} stable
+        repo: deb https://repos.influxdata.com/{{ ansible_facts['lsb']['id']|lower }} {{ ansible_facts['lsb']['codename'] }} stable
         state: present
         filename: influxdb
 
