@@ -1,7 +1,7 @@
 ---
 - name: Usecase 3
   hosts: Ubuntu
-  gather_facts: false
+
   become: yes
   vars_files:
     - vars.yaml
@@ -9,7 +9,7 @@
   tasks:
     - name: Include tasks for Ubuntu
       include_tasks: ./play_inc_baseOS_Ubuntu.yaml
-      when: ansible_facts['distribution'] == "Ubuntu"
+      when: ansible_facts['os_family'] == "Debian"
 
     - name: Include tasks for RedHat
       include_tasks: ./play_inc_baseOS_RedHat.yaml
