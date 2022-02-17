@@ -56,9 +56,9 @@
 
 - name: Add config snippet into nginx configuration file
   blockinfile:
-    insertafter: "server {"
+    insertafter: "^server {"
     path: /etc/nginx/sites-enabled/default
-    #validate: "nginx -c %s -t"
+    validate: "nginx -c %s -t"
     block: |
       location /server_status {
         stub_status on;
