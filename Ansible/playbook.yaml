@@ -1,6 +1,7 @@
 ---
 - name: Usecase 3
   hosts: Ubuntu
+  gather_facts: false
   become: yes
   vars_files:
     - vars.yaml
