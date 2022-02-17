@@ -30,7 +30,7 @@ resource "azurerm_key_vault" "vault" {
     object_id = data.azurerm_client_config.current.object_id
 
     certificate_permissions = ["create", "get", "list", "recover", "delete", "purge"] # delete and purge for "terraform destroy" to work
-    secret_permissions      = ["set", "get", "delete", "purge", "recover"]
+    secret_permissions      = ["set", "get", "delete", "purge", "recover", "list"]
   }
 
   # Allow access from the gateway to access the certificate

@@ -69,7 +69,7 @@ resource "azurerm_virtual_machine" "virtual_servers" {
     disable_password_authentication = false
     ssh_keys {
       key_data = tls_private_key.ssh_key.public_key_openssh
-      path     = "/home/${var.virtual_server_name}-${count.index}/.ssh/authorized_keys"
+      path     = "/home/${local.naming_prefix}-${var.virtual_server_name}-${count.index}-admin/.ssh/authorized_keys"
     }
   }
 

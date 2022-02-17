@@ -71,6 +71,7 @@ module "VSI_Webserver" {
   env                 = var.env
   vm_size             = "Standard_DS1_v2"
   virtual_server_name = var.webserver_name
+  virtual_server_count = 1
 
   vault_name           = module.Azure_Key_Vault.vault_name
   resource_group_name  = module.Vnet.resource_group_name
@@ -87,6 +88,13 @@ module "Ansible" {
   vm_size             = "Standard_DS1_v2"
   virtual_server_name = "ansible"
   virtual_server_count = 1
+  vm_image = {
+    publisher = "RedHat"
+    offer     = "RHEL"
+    sku       = "8-LVM"
+    version   = "latest"
+  }
+  script = "install-ansible.sh"
 
   vault_name           = module.Azure_Key_Vault.vault_name
   resource_group_name  = module.Vnet.resource_group_name
