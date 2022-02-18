@@ -3,10 +3,8 @@
 # chmod 400 .ssh/private_key.pem
 
 
-#Create config for ansible
-#
-#sudo mkdir /etc/ansible
-#cat << EOF > /etc/ansible/ansible.cfg
+#Create config for ansible in home directory to disable warning (otherwise azure pipeline fails)
+#cat << EOF > .ansible.cfg
 ## config file for ansible -- http://ansible.com/
 ## ==============================================
 #
@@ -40,3 +38,9 @@
 # secret=k6H7Q~y2Hpsk2AWjxxY3kYyhw5M4_MaXLQtC_
 # tenant=e205499b-d99a-415a-9534-683ac582c1c5
 # private_key.pem =
+
+
+
+The authenticity of host '10.0.2.4 (10.0.2.4)' can't be established.
+ECDSA key fingerprint is SHA256:Jv11qvN2bPfrdBst2W1V70CcehX6Qv9QpcZHG2/44g4.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
