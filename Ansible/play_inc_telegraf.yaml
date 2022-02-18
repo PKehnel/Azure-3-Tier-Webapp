@@ -48,7 +48,16 @@
   when: ansible_facts['os_family'] == "Debian"
 
 - name: Generate Telegraf config
-  command: telegraf --input-filter cpu:mem:nginx --output-filter azure_monitor config > /etc/telegraf/telegraf.conf
+  command: telegraf --input-filter cpu:mem --output-filter azure_monitor config | sudo tee /etc/telegraf/telegraf.conf >/dev/null
+
+- name: Append nginx config
+  blockinfile:
+    path: /etc/telegraf/telegraf.conf
+    block: |
+      [[inputs.nginx]]
+        # An array of Nginx stub_status URI to gather stats.
+        urls = ["http://localhost/server_status"]
+        response_timeout = "5s"
 
 - name: Add config snippet into nginx configuration file
   blockinfile:
