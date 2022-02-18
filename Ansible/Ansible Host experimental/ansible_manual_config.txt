@@ -1,0 +1,42 @@
+# "script": "${base64encode(templatefile("${path.module}/${var.script}", { arg="test"}))}"
+# add private key
+# chmod 400 .ssh/private_key.pem
+
+
+#Create config for ansible
+#
+#sudo mkdir /etc/ansible
+#cat << EOF > /etc/ansible/ansible.cfg
+## config file for ansible -- http://ansible.com/
+## ==============================================
+#
+## nearly all parameters can be overridden in ansible-playbook
+## or with command line flags. ansible will read ANSIBLE_CONFIG,
+## ansible.cfg in the current working directory, .ansible.cfg in
+## the home directory or /etc/ansible/ansible.cfg, whichever it
+## finds first
+#
+#[defaults]
+#
+#deprecation_warnings = False
+#EOF
+
+#sudo mkdir /myagent
+#cd /myagent
+#sudo wget https://vstsagentpackage.azureedge.net/agent/2.179.0/vsts-agent-linux-x64-2.179.0.tar.gz
+#sudo tar zxvf ./vsts-agent-linux-x64-2.179.0.tar.gz
+#sudo chmod -R 777 /myagent
+#runuser -l MyVmUser -c '/myagent/config.sh --unattended  --url https://dev.azure.com/UIT-DEMO --auth j7swyc5524upmerojisbuwasodv536pjk26womfmlafywudlfsra --token MyDevOpsToken --pool Ansible'
+#sudo /myagent/svc.sh install
+#sudo /myagent/svc.sh start
+#exit 0
+
+# PAT: j7swyc5524upmerojisbuwasodv536pjk26womfmlafywudlfsra
+# pool: Ansible
+# Org: https://dev.azure.com/UIT-DEMO
+
+# subscription_id=b930202f-9e27-40c2-b275-03609596ad3b
+# client_id=f1ba5d01-003f-4549-9fe8-2f223bb4ba22
+# secret=k6H7Q~y2Hpsk2AWjxxY3kYyhw5M4_MaXLQtC_
+# tenant=e205499b-d99a-415a-9534-683ac582c1c5
+# private_key.pem =
