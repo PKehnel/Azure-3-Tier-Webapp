@@ -71,7 +71,7 @@ module "VSI_Webserver" {
   env                 = var.env
   vm_size             = "Standard_DS1_v2"
   virtual_server_name = var.webserver_name
-  virtual_server_count = 1
+  virtual_server_count = var.webserver_count
 
   vault_name           = module.Azure_Key_Vault.vault_name
   resource_group_name  = module.Vnet.resource_group_name
@@ -87,7 +87,7 @@ module "Ansible" {
   env                 = var.env
   vm_size             = "Standard_DS1_v2"
   virtual_server_name = "ansible"
-  virtual_server_count = 1
+  virtual_server_count = var.webserver_count
   vm_image = {
     publisher = "RedHat"
     offer     = "RHEL"
@@ -103,20 +103,21 @@ module "Ansible" {
   depends_on = [module.Vnet]
 }
 
-#module "Application_Gateway" {
-#  source = "../../modules/Application Gateway"
-#
-#  stage            = var.stage
-#  env              = var.env
-#  app_gateway_name = var.app_gateway_name
-#
-#  webserver_name       = module.VSI_Webserver.virtual_server_name
-#  vault_name           = module.Azure_Key_Vault.vault_name
-#  resource_group_name  = module.Vnet.resource_group_name
-#  virtual_network_name = module.Vnet.vnet_name
-#
-#  depends_on = [module.Vnet, module.Azure_Key_Vault]
-#}
+module "Application_Gateway" {
+  source = "../../modules/Application Gateway"
+
+  stage            = var.stage
+  env              = var.env
+  app_gateway_name = var.app_gateway_name
+  webserver_count = 1
+
+  webserver_name       = module.VSI_Webserver.virtual_server_name
+  vault_name           = module.Azure_Key_Vault.vault_name
+  resource_group_name  = module.Vnet.resource_group_name
+  virtual_network_name = module.Vnet.vnet_name
+
+  depends_on = [module.Vnet, module.Azure_Key_Vault]
+}
 
 #module "PostGreSQL_PaaS" {
 #  source = "../../modules/PostGreSQL PaaS"

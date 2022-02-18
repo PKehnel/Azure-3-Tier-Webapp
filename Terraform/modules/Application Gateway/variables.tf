@@ -7,7 +7,7 @@ variable "webserver_name" {}
 
 variable "subnet_name" { default = null }
 variable "app_gateway_name" { default = "app_gateway" }
-
+variable "webserver_count" {}
 
 
 

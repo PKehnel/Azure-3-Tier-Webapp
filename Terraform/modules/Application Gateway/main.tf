@@ -54,7 +54,7 @@ resource "azurerm_application_gateway" "appgw" {
   sku {
     name     = "Standard_V2"
     tier     = "Standard_V2"
-    capacity = 2
+    capacity = var.webserver_count
   }
 
   identity {
@@ -149,14 +149,14 @@ resource "azurerm_application_gateway" "appgw" {
 }
 
 data "azurerm_network_interface" "nic_webservers" {
-  count               = 2
+  count               = var.webserver_count
   name                = "webnic-${var.webserver_name[count.index]}"
   resource_group_name = var.resource_group_name
 }
 
 # binding happens here
 resource "azurerm_network_interface_application_gateway_backend_address_pool_association" "nic_2_gw_binding" {
-  count                   = 2
+  count                   = var.webserver_count
   network_interface_id    = data.azurerm_network_interface.nic_webservers[count.index].id
   ip_configuration_name   = "IPConfiguration"
   backend_address_pool_id = azurerm_application_gateway.appgw.backend_address_pool[0].id
