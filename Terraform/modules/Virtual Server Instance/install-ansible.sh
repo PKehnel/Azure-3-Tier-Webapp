@@ -3,7 +3,8 @@
 sudo yum update -y
 
 # Git for agent
-sudo yum install git -y
+sudo yum install git -y # this failed?
+
 # Install Python 3 and pip.
 sudo yum install -y python3-pip
 #sudo yum install @python38
