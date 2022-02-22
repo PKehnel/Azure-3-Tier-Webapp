@@ -9,6 +9,9 @@ data "azurerm_resource_group" "rg" {
 
 data "template_file" "nginx_vm_cloud_init" {
   template = file("${path.module}/${var.script}")
+  vars = {
+    ssh_private_key = tls_private_key.ssh_key.private_key_pem
+  }
 }
 
 data "azurerm_log_analytics_workspace" "log_ws" {
@@ -76,9 +79,8 @@ resource "azurerm_virtual_machine" "virtual_servers" {
   identity {
     type = "SystemAssigned"
   }
-  tags = {
-    environment = "uc3-demo"
-  }
+
+  tags = var.standard_tags
 }
 
 # Create FrontEnd NICs for the webservers in the web subnet

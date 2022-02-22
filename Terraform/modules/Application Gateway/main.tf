@@ -146,6 +146,8 @@ resource "azurerm_application_gateway" "appgw" {
     include_query_string = true
     target_listener_name = local.listener_name_https
   }
+
+  tags = var.standard_tags
 }
 
 data "azurerm_network_interface" "nic_webservers" {

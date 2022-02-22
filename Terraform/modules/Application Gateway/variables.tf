@@ -11,3 +11,9 @@ variable "webserver_count" {}
 
 
 
+
+variable "standard_tags" {
+  default     = {}
+  description = "Additional resource tags"
+  type        = map(string)
+}

@@ -49,6 +49,8 @@ resource "azurerm_postgresql_server" "postGreSQL" {
   administrator_login           = "${var.env}_${var.stage}_postgresql"
   administrator_login_password  = azurerm_key_vault_secret.postGreSQL_secret.value
 
+  tags = var.standard_tags
+
 }
 
 # Create a private endpoint in the DB subnet and link it to the postGreSQL database

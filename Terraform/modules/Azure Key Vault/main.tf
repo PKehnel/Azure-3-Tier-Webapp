@@ -46,6 +46,7 @@ resource "azurerm_key_vault" "vault" {
     default_action = "Allow"
     bypass         = "AzureServices"
   }
+  tags = var.standard_tags
 }
 
 # Create a self signed certificate

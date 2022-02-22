@@ -9,7 +9,7 @@ resource "azurerm_resource_group" "rg" {
   name     = "${local.naming_prefix}-rg"
   location = var.azure_region
   tags = merge(var.standard_tags,
-  { Type = "PoC" }, )
+  { type = "DemoEnv" }, )
 }
 
 # Create a LogAnalytics Workspace

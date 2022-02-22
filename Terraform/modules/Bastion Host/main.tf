@@ -34,4 +34,6 @@ resource "azurerm_bastion_host" "bastion" {
     subnet_id            = data.azurerm_subnet.subnet.id
     public_ip_address_id = azurerm_public_ip.pip_bastion.id
   }
+
+  tags = var.standard_tags
 }
