@@ -126,20 +126,20 @@ module "Application_Gateway" {
   depends_on = [module.Vnet, module.Azure_Key_Vault]
 }
 
-module "PostGreSQL_PaaS" {
-  source = "../../modules/PostGreSQL PaaS"
-
-  stage           = var.stage
-  env             = var.env
-  postGreSQL_name = var.postGreSQL_name
-  vault_name      = module.Azure_Key_Vault.vault_name
-
-  resource_group_name  = module.Vnet.resource_group_name
-  virtual_network_name = module.Vnet.vnet_name
-
-  depends_on = [module.Vnet]
-}
-
+#module "PostGreSQL_PaaS" {
+#  source = "../../modules/PostGreSQL PaaS"
+#
+#  stage           = var.stage
+#  env             = var.env
+#  postGreSQL_name = var.postGreSQL_name
+#  vault_name      = module.Azure_Key_Vault.vault_name
+#
+#  resource_group_name  = module.Vnet.resource_group_name
+#  virtual_network_name = module.Vnet.vnet_name
+#
+#  depends_on = [module.Vnet]
+#}
+#
 
 # PostgreSQL DB could also be setup via VSI with a install script
 #module "VSI_DB" {

@@ -27,7 +27,7 @@ resource "random_string" "random_suffix" {
 }
 
 # Create the mySQL database as PaaS service. Must be General Purpose SKU to be able to use Private Link service
-resource "azurerm_postgresql_server" "postGreSQL" {
+resource "azurerm_postgresql_flexible_server" "postGreSQL" {
   # unique name is required
   name                = "${local.naming_prefix}-postgresql-${random_string.random_suffix.result}"
   location            = local.location
