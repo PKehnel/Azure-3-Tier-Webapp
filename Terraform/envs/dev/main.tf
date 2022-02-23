@@ -40,8 +40,8 @@ module "Vnet" {
 module "Azure_Key_Vault" {
   source = "../../modules/Azure Key Vault"
 
-  stage        = var.stage
-  env          = var.env
+  stage          = var.stage
+  env            = var.env
   webserver_name = var.webserver_name
 
   resource_group_name  = module.Vnet.resource_group_name
@@ -68,10 +68,10 @@ module "Bastion_Host" {
 module "VSI_Webserver" {
   source = "../../modules/Virtual Server Instance"
 
-  stage               = var.stage
-  env                 = var.env
-  vm_size             = "Standard_DS1_v2"
-  virtual_server_name = var.webserver_name
+  stage                = var.stage
+  env                  = var.env
+  vm_size              = "Standard_DS1_v2"
+  virtual_server_name  = var.webserver_name
   virtual_server_count = var.webserver_count
 
   vault_name           = module.Azure_Key_Vault.vault_name
@@ -84,10 +84,10 @@ module "VSI_Webserver" {
 module "Ansible" {
   source = "../../modules/Virtual Server Instance"
 
-  stage               = var.stage
-  env                 = var.env
-  vm_size             = "Standard_DS1_v2"
-  virtual_server_name = "ansible"
+  stage                = var.stage
+  env                  = var.env
+  vm_size              = "Standard_DS1_v2"
+  virtual_server_name  = "ansible"
   virtual_server_count = var.webserver_count
   vm_image = {
     publisher = "RedHat"
@@ -95,7 +95,7 @@ module "Ansible" {
     sku       = "8-LVM"
     version   = "latest"
   }
-  script = "install-ansible.sh"
+  script = "install-redhat-test.sh"
 
   vault_name           = module.Azure_Key_Vault.vault_name
   resource_group_name  = module.Vnet.resource_group_name
@@ -103,7 +103,7 @@ module "Ansible" {
 
   depends_on = [module.Vnet]
 }
-
+#
 #module "Application_Gateway" {
 #  source = "../../modules/Application Gateway"
 #

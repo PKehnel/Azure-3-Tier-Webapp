@@ -2,29 +2,29 @@
 userName="case3-dev-ansible-0-admin"
 userHome="/home/case3-dev-ansible-0-admin"
 
+#sudo update -y
 
-sleep 60
 # Update all packages that have available updates.
-sudo yum update -y | tee -a "$userHome/log_ansible"
-
-# Git for agent
-sudo -u $userName yum install -y git | tee -a "$userHome/log_ansible" #todo  this failed?
+sudo yum update -y
 
 # Install Python 3 and pip.
-sudo -u $userName yum install -y python3-pip
+sudo yum install -y python3-pip
 #sudo -u $userName yum install @python38
 
+# Git for agent
+sudo yum install -y git
+
 # Upgrade pip3.
-pip3 install --upgrade pip
+pip3 -u $userName install --upgrade pip
 
 # Install ansible
-pip3 install ansible
+pip3 -u $userName install ansible
 
 # Install Ansible az collection for interacting with Azure.
-ansible-galaxy collection install azure.azcollection | tee -a "$userHome/log_ansible"
+ansible-galaxy collection install azure.azcollection
 
 # Install Ansible modules for Azure
-sudo -u $userName pip3 install -r ~/.ansible/collections/ansible_collections/azure/azcollection/requirements-azure.txt #todo find location
+pip3 -u $userName install -r $userHome/.ansible/collections/ansible_collections/azure/azcollection/requirements-azure.txt #todo find location
 
 #sudo -u $userName mkdir ~/.azure # this fails
 sudo -u $userName mkdir "$userHome/.azure"

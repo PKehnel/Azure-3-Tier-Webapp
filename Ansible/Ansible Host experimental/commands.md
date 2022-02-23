@@ -58,7 +58,7 @@ EOF
 ## Ansible Dynamic Inventory
 ```
 cat << EOF > myazure_rm.yml
-plugin: azure.azcollection.azure_rm
+plugin: azure_rm
 include_vm_resource_groups:
   - case3-dev-rg
 auth_source: auto
@@ -66,7 +66,7 @@ conditional_groups:
   RedHat: "'RHEL' in image.offer"
   Ubuntu: "'UbuntuServer' in image.offer"
 keyed_groups:
- - key: tags.environment
+ - key: tags.env
 EOF
 ```
 

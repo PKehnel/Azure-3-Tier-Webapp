@@ -65,7 +65,7 @@ resource "azurerm_virtual_machine" "virtual_servers" {
     computer_name  = "${var.virtual_server_name}-${count.index}"
     admin_username = "${local.naming_prefix}-${var.virtual_server_name}-${count.index}-admin"
     admin_password = azurerm_key_vault_secret.virtual_server_secret.value
-    custom_data    = base64encode(data.template_file.nginx_vm_cloud_init.rendered)
+    #custom_data    = base64encode(data.template_file.nginx_vm_cloud_init.rendered)
   }
 
   os_profile_linux_config {
@@ -153,7 +153,7 @@ resource "azurerm_key_vault_secret" "virtual_server_secret" {
 # Create (and display) an SSH key
 resource "tls_private_key" "ssh_key" {
   algorithm = "RSA"
-  rsa_bits = 4096
+  rsa_bits  = 4096
 }
 
 resource "azurerm_key_vault_secret" "private_ssh_key" {
@@ -163,3 +163,18 @@ resource "azurerm_key_vault_secret" "private_ssh_key" {
 }
 
 
+resource "azurerm_virtual_machine_extension" "startup" {
+  count                = var.virtual_server_name != "ansible" ? 0 : 1
+  name                 = "startup"
+  virtual_machine_id   = azurerm_virtual_machine.virtual_servers[count.index].id
+  publisher            = "Microsoft.Azure.Extensions"
+  type                 = "CustomScript"
+  type_handler_version = "2.0"
+
+  protected_settings = <<PROT
+    {
+        "script": "${base64encode(data.template_file.nginx_vm_cloud_init.rendered)}"
+    }
+    PROT
+
+}
