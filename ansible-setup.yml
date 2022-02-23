@@ -4,7 +4,8 @@
 # https://aka.ms/yaml
 
 trigger:
-- PipelineWorking
+- none
+- #PipelineWorking
 
 pool:
   name: Ansible

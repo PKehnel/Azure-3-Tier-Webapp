@@ -44,6 +44,7 @@ module "Azure_Key_Vault" {
   env            = var.env
   webserver_name = var.webserver_name
 
+  standard_tags = var.tags
   resource_group_name  = module.Vnet.resource_group_name
   virtual_network_name = module.Vnet.vnet_name
 
@@ -58,6 +59,7 @@ module "Bastion_Host" {
   stage            = var.stage
   env              = var.env
   bastionhost_name = var.bastionhost_name
+  standard_tags = var.tags
 
   resource_group_name  = module.Vnet.resource_group_name
   virtual_network_name = module.Vnet.vnet_name
@@ -73,6 +75,8 @@ module "VSI_Webserver" {
   vm_size              = "Standard_DS1_v2"
   virtual_server_name  = var.webserver_name
   virtual_server_count = var.webserver_count
+  standard_tags = var.tags
+
   public_ssh_key       = module.Azure_Key_Vault.public_ssh_key_webserver
   vault_name           = module.Azure_Key_Vault.vault_name
   resource_group_name  = module.Vnet.resource_group_name
@@ -97,6 +101,7 @@ module "Ansible" {
   }
   script = "install-redhat-test.sh"
   standard_tags = var.tags
+
   vault_name           = module.Azure_Key_Vault.vault_name
   public_ssh_key       = module.Azure_Key_Vault.public_ssh_key_webserver
   resource_group_name  = module.Vnet.resource_group_name
@@ -121,19 +126,19 @@ module "Application_Gateway" {
   depends_on = [module.Vnet, module.Azure_Key_Vault]
 }
 
-#module "PostGreSQL_PaaS" {
-#  source = "../../modules/PostGreSQL PaaS"
-#
-#  stage           = var.stage
-#  env             = var.env
-#  postGreSQL_name = var.postGreSQL_name
-#  vault_name      = module.Azure_Key_Vault.vault_name
-#
-#  resource_group_name  = module.Vnet.resource_group_name
-#  virtual_network_name = module.Vnet.vnet_name
-#
-#  depends_on = [module.Vnet]
-#}
+module "PostGreSQL_PaaS" {
+  source = "../../modules/PostGreSQL PaaS"
+
+  stage           = var.stage
+  env             = var.env
+  postGreSQL_name = var.postGreSQL_name
+  vault_name      = module.Azure_Key_Vault.vault_name
+
+  resource_group_name  = module.Vnet.resource_group_name
+  virtual_network_name = module.Vnet.vnet_name
+
+  depends_on = [module.Vnet]
+}
 
 
 # PostgreSQL DB could also be setup via VSI with a install script
