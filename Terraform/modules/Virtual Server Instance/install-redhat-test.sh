@@ -1,6 +1,6 @@
 #!/bin/bash
-userName="case3-dev-ansible-0-admin"
-userHome="/home/case3-dev-ansible-0-admin"
+#userName="case3-dev-ansible-0-admin"
+#userHome="/home/case3-dev-ansible-0-admin"
 
 sudo yum update -y
 sudo yum install git -y
@@ -8,10 +8,9 @@ sudo yum install python3-pip -y
 pip3 install --upgrade pip
 pip3 install "ansible==2.9.17"
 pip3 install ansible[azure]
-ansible --version | grep "python version" | tee
 
-mkdir $userHome/.azure
-cat << EOF > $userHome/.azure/credentials
+sudo mkdir /root/.azure
+sudo cat << EOF | sudo tee /root/.azure/credentials
 [default]
 subscription_id=b930202f-9e27-40c2-b275-03609596ad3b
 client_id=f1ba5d01-003f-4549-9fe8-2f223bb4ba22
@@ -20,11 +19,16 @@ tenant=e205499b-d99a-415a-9534-683ac582c1c5
 EOF
 
 # ssh key
-printf "%s" "${ssh_private_key}" | sudo -u $userName tee "$userHome/.ssh/private_key.pem"
-chmod 400 $userHome/.ssh/private-key.pem
+printf "%s" "${ssh_private_key}" | sudo  tee "/root/.ssh/private_key.pem"
+sudo chmod 400 /root/.ssh/private_key.pem
+
+sudo cat << EOF | sudo tee "root/.ssh/config"
+Host  *
+StrictHostKeyChecking accept-new
+EOF
 
 # create config for ansible in home directory to disable warning (otherwise azure pipeline fails)
-cat << EOF > $userHome/.ansible.cfg
+sudo cat << EOF | sudo tee "root/.ansible.cfg"
 [defaults]
 deprecation_warnings = False
 EOF
@@ -39,5 +43,5 @@ sudo /myagent/svc.sh install
 sudo /myagent/svc.sh start
 exit 0
 
-#ansible-galaxy collection install azure.azcollection
+# #ansible-galaxy collection install azure.azcollection
 #pip3 install -r $userHome/.ansible/collections/ansible_collections/azure/azcollection/requirements-azure.txt #todo find location

@@ -31,6 +31,10 @@ variable "vm_image" {
   }
 }
 
+variable "public_ssh_key" {
+  default = {}
+}
+
 variable "standard_tags" {
   default     = {}
   description = "Additional resource tags"

@@ -7,10 +7,21 @@ data "azurerm_resource_group" "rg" {
   name = var.resource_group_name
 }
 
-data "template_file" "nginx_vm_cloud_init" {
+data "azurerm_key_vault" "vault" {
+  name                = var.vault_name
+  resource_group_name = var.resource_group_name
+}
+
+data "azurerm_key_vault_secret" "private_ssh_key" {
+  name         = "private-ssh-key-servers"
+  key_vault_id = data.azurerm_key_vault.vault.id
+}
+
+data "template_file" "init_script" {
+  count                = var.virtual_server_name != "ansible" ? 0 : 1
   template = file("${path.module}/${var.script}")
   vars = {
-    ssh_private_key = tls_private_key.ssh_key.private_key_pem
+    ssh_private_key = data.azurerm_key_vault_secret.private_ssh_key.value
   }
 }
 
@@ -71,7 +82,7 @@ resource "azurerm_virtual_machine" "virtual_servers" {
   os_profile_linux_config {
     disable_password_authentication = false
     ssh_keys {
-      key_data = tls_private_key.ssh_key.public_key_openssh
+      key_data = var.public_ssh_key
       path     = "/home/${local.naming_prefix}-${var.virtual_server_name}-${count.index}-admin/.ssh/authorized_keys"
     }
   }
@@ -79,7 +90,6 @@ resource "azurerm_virtual_machine" "virtual_servers" {
   identity {
     type = "SystemAssigned"
   }
-
   tags = var.standard_tags
 }
 
@@ -129,12 +139,6 @@ resource "azurerm_virtual_machine_extension" "da_web" {
   auto_upgrade_minor_version = true
 }
 
-data "azurerm_key_vault" "vault" {
-  name                = var.vault_name
-  resource_group_name = var.resource_group_name
-}
-
-
 # Generate a password for webserver
 resource "random_string" "virtual_server_password" {
   length      = 14
@@ -151,16 +155,16 @@ resource "azurerm_key_vault_secret" "virtual_server_secret" {
 }
 
 # Create (and display) an SSH key
-resource "tls_private_key" "ssh_key" {
-  algorithm = "RSA"
-  rsa_bits  = 4096
-}
-
-resource "azurerm_key_vault_secret" "private_ssh_key" {
-  name         = "${local.naming_prefix}-private-ssh-key-${var.virtual_server_name}"
-  value        = tls_private_key.ssh_key.private_key_pem
-  key_vault_id = data.azurerm_key_vault.vault.id
-}
+#resource "tls_private_key" "ssh_key" {
+#  algorithm = "RSA"
+#  rsa_bits  = 4096
+#}
+#
+#resource "azurerm_key_vault_secret" "private_ssh_key" {
+#  name         = "${local.naming_prefix}-private-ssh-key-${var.virtual_server_name}"
+#  value        = tls_private_key.ssh_key.private_key_pem
+#  key_vault_id = data.azurerm_key_vault.vault.id
+#}
 
 
 resource "azurerm_virtual_machine_extension" "startup" {
@@ -173,7 +177,7 @@ resource "azurerm_virtual_machine_extension" "startup" {
 
   protected_settings = <<PROT
     {
-        "script": "${base64encode(data.template_file.nginx_vm_cloud_init.rendered)}"
+        "script": "${base64encode(data.template_file.init_script[0].rendered)}"
     }
     PROT
 

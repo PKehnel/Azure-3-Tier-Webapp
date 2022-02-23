@@ -4,4 +4,3 @@
 output "vault_name" {
   value = module.Azure_Key_Vault.vault_name
 }
-

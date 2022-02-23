@@ -110,11 +110,23 @@ resource "azurerm_user_assigned_identity" "agw" {
   name                = "agw-msi"
 }
 
-# TODO Can this be removed
 # Allows some time for the certificate to be created
 resource "time_sleep" "wait_seconds" {
   depends_on = [azurerm_key_vault_certificate.certificate]
 
-  create_duration = "15s"
+  create_duration = "5s"
 }
+
+# Create (and display) an SSH key
+resource "tls_private_key" "ssh_key" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "azurerm_key_vault_secret" "private_ssh_key" {
+  name         = "private-ssh-key-servers"#"${local.naming_prefix}-private-ssh-key-${var.webserver_name}"
+  value        = tls_private_key.ssh_key.private_key_pem
+  key_vault_id = azurerm_key_vault.vault.id
+}
+
 

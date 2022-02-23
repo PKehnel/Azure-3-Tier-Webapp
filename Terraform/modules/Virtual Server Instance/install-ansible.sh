@@ -38,7 +38,7 @@ tenant=e205499b-d99a-415a-9534-683ac582c1c5
 EOF
 
 sudo -u $userName mkdir $userHome/.ssh
-cat << EOF | sudo -u $userName tee $userHome/.ssh/config
+cat << EOF > .ssh/config
 Host  *
 StrictHostKeyChecking accept-new
 EOF
