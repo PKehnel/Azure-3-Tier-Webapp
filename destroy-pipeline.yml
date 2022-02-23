@@ -7,9 +7,10 @@ trigger:
 - none
 
 pool:
-  name: Default
+  vmImage: windows-latest
+  #name: Default
   #replace with
-  #vmImage: windows-latest
+
 
 jobs:
 - job: UseCase3
