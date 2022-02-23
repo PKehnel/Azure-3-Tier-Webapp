@@ -111,7 +111,7 @@ module "Application_Gateway" {
   stage            = var.stage
   env              = var.env
   app_gateway_name = var.app_gateway_name
-  webserver_count = 1
+  webserver_count = var.webserver_count
 
   webserver_name       = module.VSI_Webserver.virtual_server_name
   vault_name           = module.Azure_Key_Vault.vault_name

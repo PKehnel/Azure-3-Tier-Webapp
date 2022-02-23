@@ -22,13 +22,13 @@ EOF
 printf "%s" "${ssh_private_key}" | sudo  tee "/root/.ssh/private_key.pem"
 sudo chmod 400 /root/.ssh/private_key.pem
 
-sudo cat << EOF | sudo tee "root/.ssh/config"
+sudo cat << EOF | sudo tee "/root/.ssh/config"
 Host  *
 StrictHostKeyChecking accept-new
 EOF
 
 # create config for ansible in home directory to disable warning (otherwise azure pipeline fails)
-sudo cat << EOF | sudo tee "root/.ansible.cfg"
+sudo cat << EOF | sudo tee "/root/.ansible.cfg"
 [defaults]
 deprecation_warnings = False
 EOF
