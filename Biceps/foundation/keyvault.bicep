@@ -11,7 +11,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
   tags: {
     tagName1: 'infra'
   }
-  tenantId: [subscription().tenantId]
+  tenantId: subscription().tenantId
   properties: {
     accessPolicies: [
       {
