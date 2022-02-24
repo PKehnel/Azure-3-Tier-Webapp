@@ -27,7 +27,7 @@ jobs:
       workingDirectory: '$(System.DefaultWorkingDirectory)\Terraform\envs\dev'
       backendServiceArm: SC4TF
       backendAzureRmResourceGroupName: 'rg-tfstate'
-      backendAzureRmStorageAccountName: 'acc-tfstate'
+      backendAzureRmStorageAccountName: 'acctfstate'
       backendAzureRmContainerName: 'container-tfstate'
       backendAzureRmKey: tf-uc3.tfstate
 

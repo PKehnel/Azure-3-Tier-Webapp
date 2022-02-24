@@ -1,10 +1,9 @@
-param stgAccountName string
-param stgAccountContainerName string
+param vaultName string = 'infra-key-vault'
 param location string = resourceGroup().location
 
 
 resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
-  name: infra-keyvault
+  name: vaultName
   location: location
   tags: {
     tagName1: 'infra'
