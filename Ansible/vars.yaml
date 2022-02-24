@@ -2,6 +2,9 @@
 user_list:
   - ansible
 
+ansible_user: "case3-dev-webserver-0-admin"
+ansible_ssh_private_key_file: ~/.ssh/private_key.pem
+
 userdetails:
   ansible:
     password: '{{ ansible_pass }}'

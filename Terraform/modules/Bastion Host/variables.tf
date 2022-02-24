@@ -1,9 +1,13 @@
-variable "azure_region" { default = "westeurope" }
-variable "env" { default = "usecase3" }
-variable "stage" { default = "dev" }
-variable "vnet_name" { default = "vnet"}
+variable "env" {}
+variable "stage" {}
+variable "resource_group_name" {}
+variable "virtual_network_name" {}
 
 variable "bastionhost_name" { default = "BastionHost" }
 
-
+variable "standard_tags" {
+  default     = {}
+  description = "Additional resource tags"
+  type        = map(string)
+}
 

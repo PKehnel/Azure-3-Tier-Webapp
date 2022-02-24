@@ -1,0 +1,88 @@
+---
+- block: 
+    - name: DBG - Telegraf installation and configuration RHEL/CentOS
+      debug:
+        msg: Starting OS specific steps for RHEL/CentOS
+
+    - name: Add yum/dnf repository
+      yum_repository:
+        name: influxdb
+        description: InfluxDB Repository - RHEL $releasever
+        file: influxdb
+        baseurl: https://repos.influxdata.com/rhel/$releasever/$basearch/stable
+        gpgkey: https://repos.influxdata.com/influxdb.key
+        gpgcheck: 1
+        enabled: 1
+        state: present
+
+    - name: Install Telegraf
+      dnf:
+        name: telegraf
+        state: latest
+        update_cache: yes
+
+  when: ansible_facts['os_family'] == "RedHat"
+
+- block: 
+    - name: DBG - Telegraf installation and configuration Debian/Ubuntu
+      debug:
+        msg: Starting OS specific steps for Debian/Ubuntu
+
+    - name: Add apt key
+      apt_key:
+        url: https://repos.influxdata.com/influxdb.key
+        state: present
+
+    - name: Add sources.list file
+      apt_repository:
+        repo: deb https://repos.influxdata.com/{{ ansible_facts['lsb']['id']|lower }} {{ ansible_facts['lsb']['codename'] }} stable
+        state: present
+        filename: influxdb
+
+    - name: Install Telegraf
+      apt:
+        name: telegraf
+        state: latest
+        update_cache: yes
+
+  when: ansible_facts['os_family'] == "Debian"
+
+- name: Generate Telegraf config
+  command: telegraf --input-filter cpu:mem --output-filter azure_monitor config | sudo tee /etc/telegraf/telegraf.conf >/dev/null
+
+- name: Append nginx config
+  blockinfile:
+    path: /etc/telegraf/telegraf.conf
+    block: |
+      [[inputs.nginx]]
+        # An array of Nginx stub_status URI to gather stats.
+        urls = ["http://localhost/server_status"]
+        response_timeout = "5s"
+
+- name: Add config snippet into nginx configuration file
+  blockinfile:
+    insertafter: "^server {"
+    path: /etc/nginx/sites-enabled/default
+    #validate: "nginx -c %s -t"
+    block: |
+      location /server_status {
+        stub_status on;
+        access_log off;
+        allow all;
+      }
+
+- name: Reload nginx
+  systemd:
+    name: nginx
+    enabled: yes
+    masked: no
+    state: reloaded
+
+- name: restart telegraf
+  systemd:
+    name: telegraf
+    enabled: yes
+    masked: no
+    state: restarted
+
+...

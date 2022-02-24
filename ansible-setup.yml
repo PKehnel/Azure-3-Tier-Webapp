@@ -1,0 +1,20 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- none
+- #PipelineWorking
+
+pool:
+  name: Ansible
+
+steps:
+- task: ms-vscs-rm.vss-services-ansible.ansible-task.Ansible@0
+  displayName: 'Run playbook'
+  inputs:
+    playbookPathOnAgentMachine: '$(System.DefaultWorkingDirectory)/Ansible/playbook.yaml'
+    failOnStdErr: false
+    inventoriesAgentMachine: file
+    inventoryFileOnAgentMachine: '$(System.DefaultWorkingDirectory)/Ansible/inventory_azure_rm.yaml'

@@ -1,11 +1,10 @@
 locals {
-  naming_prefix       = "${var.env}-${var.stage}"
-  location            = data.azurerm_resource_group.rg.location
-  resource_group_name = data.azurerm_resource_group.rg.name
+  naming_prefix = "${var.env}-${var.stage}"
+  location      = data.azurerm_resource_group.rg.location
 }
 
 data "azurerm_resource_group" "rg" {
-  name = "${local.naming_prefix}-rg"
+  name = var.resource_group_name
 }
 
 data "azurerm_client_config" "current" {}
@@ -19,7 +18,7 @@ resource "azurerm_key_vault" "vault" {
   # Vault names are globaly unique and max 24 chars, so add random string
   name                       = "${local.naming_prefix}-KV-${random_string.random_suffix.result}"
   location                   = local.location
-  resource_group_name        = local.resource_group_name
+  resource_group_name        = var.resource_group_name
   tenant_id                  = data.azurerm_client_config.current.tenant_id
   soft_delete_retention_days = 90
   purge_protection_enabled   = false
@@ -31,7 +30,7 @@ resource "azurerm_key_vault" "vault" {
     object_id = data.azurerm_client_config.current.object_id
 
     certificate_permissions = ["create", "get", "list", "recover", "delete", "purge"] # delete and purge for "terraform destroy" to work
-    secret_permissions      = ["set", "get", "delete", "purge", "recover"]
+    secret_permissions      = ["set", "get", "delete", "purge", "recover", "list"]
   }
 
   # Allow access from the gateway to access the certificate
@@ -47,11 +46,12 @@ resource "azurerm_key_vault" "vault" {
     default_action = "Allow"
     bypass         = "AzureServices"
   }
+  tags = var.standard_tags
 }
 
 # Create a self signed certificate
 resource "azurerm_key_vault_certificate" "certificate" {
-  name         = "${local.naming_prefix}-cert-${var.webserver_name}"
+  name         = "${local.naming_prefix}-cert"
   key_vault_id = azurerm_key_vault.vault.id
 
   certificate_policy {
@@ -106,14 +106,27 @@ resource "azurerm_key_vault_certificate" "certificate" {
 
 resource "azurerm_user_assigned_identity" "agw" {
   location            = local.location
-  resource_group_name = local.resource_group_name
+  resource_group_name = var.resource_group_name
   name                = "agw-msi"
 }
 
-# TODO Can this be removed
 # Allows some time for the certificate to be created
 resource "time_sleep" "wait_seconds" {
   depends_on = [azurerm_key_vault_certificate.certificate]
 
-  create_duration = "15s"
+  create_duration = "5s"
 }
+
+# Create (and display) an SSH key
+resource "tls_private_key" "ssh_key" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "azurerm_key_vault_secret" "private_ssh_key" {
+  name         = "private-ssh-key-servers" #"${local.naming_prefix}-private-ssh-key-${var.webserver_name}"
+  value        = tls_private_key.ssh_key.private_key_pem
+  key_vault_id = azurerm_key_vault.vault.id
+}
+
+

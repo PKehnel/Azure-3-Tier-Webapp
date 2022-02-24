@@ -1,35 +1,46 @@
 locals {
-  naming_prefix       = "${var.env}-${var.stage}"
-  location            = data.azurerm_resource_group.rg.location
-  resource_group_name = data.azurerm_resource_group.rg.name
+  naming_prefix = "${var.env}-${var.stage}"
+  location      = data.azurerm_resource_group.rg.location
 }
 
 data "azurerm_resource_group" "rg" {
-  name = "${local.naming_prefix}-rg"
+  name = var.resource_group_name
 }
 
-data "template_file" "nginx_vm_cloud_init" {
+data "azurerm_key_vault" "vault" {
+  name                = var.vault_name
+  resource_group_name = var.resource_group_name
+}
+
+data "azurerm_key_vault_secret" "private_ssh_key" {
+  name         = "private-ssh-key-servers"
+  key_vault_id = data.azurerm_key_vault.vault.id
+}
+
+data "template_file" "init_script" {
+  count    = var.virtual_server_name != "ansible" ? 0 : 1
   template = file("${path.module}/${var.script}")
+  vars = {
+    ssh_private_key = data.azurerm_key_vault_secret.private_ssh_key.value
+  }
 }
 
 data "azurerm_log_analytics_workspace" "log_ws" {
   name                = "${local.naming_prefix}-${var.log_ws_name}"
-  resource_group_name = local.resource_group_name
+  resource_group_name = var.resource_group_name
 }
 
-
-#Create the subnet that holds the web-servers
 data "azurerm_subnet" "subnet" {
   name                 = "${local.naming_prefix}-subnet_${var.subnet_name != null ? var.subnet_name : var.virtual_server_name}"
-  resource_group_name  = local.resource_group_name
-  virtual_network_name = "${local.naming_prefix}-${var.vnet_name}"
+  resource_group_name  = var.resource_group_name
+  virtual_network_name = var.virtual_network_name
 }
 
 #Create an availability set with two fault/update domains, so each webserver is placed into its own domain
 resource "azurerm_availability_set" "avset" {
   name                         = "${local.naming_prefix}-${var.virtual_server_name}-avset"
-  location                     = data.azurerm_resource_group.rg.location
-  resource_group_name          = data.azurerm_resource_group.rg.name
+  resource_group_name          = var.resource_group_name
+  location                     = local.location
   platform_fault_domain_count  = 2
   platform_update_domain_count = 2
   managed                      = true
@@ -38,8 +49,8 @@ resource "azurerm_availability_set" "avset" {
 resource "azurerm_virtual_machine" "virtual_servers" {
   count                 = var.virtual_server_count
   name                  = "${local.naming_prefix}-${var.virtual_server_name}-${count.index}"
-  location              = data.azurerm_resource_group.rg.location
-  resource_group_name   = data.azurerm_resource_group.rg.name
+  location              = local.location
+  resource_group_name   = var.resource_group_name
   availability_set_id   = azurerm_availability_set.avset.id
   network_interface_ids = [element(azurerm_network_interface.nic_webservers.*.id, count.index)]
   vm_size               = var.vm_size
@@ -65,24 +76,29 @@ resource "azurerm_virtual_machine" "virtual_servers" {
     computer_name  = "${var.virtual_server_name}-${count.index}"
     admin_username = "${local.naming_prefix}-${var.virtual_server_name}-${count.index}-admin"
     admin_password = azurerm_key_vault_secret.virtual_server_secret.value
-    custom_data    = base64encode(data.template_file.nginx_vm_cloud_init.rendered)
+    #custom_data    = base64encode(data.template_file.nginx_vm_cloud_init.rendered)
   }
 
   os_profile_linux_config {
     disable_password_authentication = false
+    ssh_keys {
+      key_data = var.public_ssh_key
+      path     = "/home/${local.naming_prefix}-${var.virtual_server_name}-${count.index}-admin/.ssh/authorized_keys"
+    }
   }
 
-  tags = {
-    environment = "uc3-demo"
+  identity {
+    type = "SystemAssigned"
   }
+  tags = var.standard_tags
 }
 
 # Create FrontEnd NICs for the webservers in the web subnet
 resource "azurerm_network_interface" "nic_webservers" {
   count               = var.virtual_server_count
-  name                = "webnic-${count.index}-${var.virtual_server_name}"
-  location            = data.azurerm_resource_group.rg.location
-  resource_group_name = data.azurerm_resource_group.rg.name
+  name                = "webnic-${local.naming_prefix}-${var.virtual_server_name}-${count.index}"
+  location            = local.location
+  resource_group_name = var.resource_group_name
 
   ip_configuration {
     name                          = "IPConfiguration"
@@ -123,12 +139,6 @@ resource "azurerm_virtual_machine_extension" "da_web" {
   auto_upgrade_minor_version = true
 }
 
-data "azurerm_key_vault" "vault" {
-  name                = var.vault_name
-  resource_group_name = local.resource_group_name
-}
-
-
 # Generate a password for webserver
 resource "random_string" "virtual_server_password" {
   length      = 14
@@ -142,4 +152,20 @@ resource "azurerm_key_vault_secret" "virtual_server_secret" {
   name         = "${local.naming_prefix}-secret-${var.virtual_server_name}"
   value        = random_string.virtual_server_password.result
   key_vault_id = data.azurerm_key_vault.vault.id
+}
+
+resource "azurerm_virtual_machine_extension" "startup" {
+  count                = var.virtual_server_name != "ansible" ? 0 : 1
+  name                 = "startup"
+  virtual_machine_id   = azurerm_virtual_machine.virtual_servers[count.index].id
+  publisher            = "Microsoft.Azure.Extensions"
+  type                 = "CustomScript"
+  type_handler_version = "2.0"
+
+  protected_settings = <<PROT
+    {
+        "script": "${base64encode(data.template_file.init_script[0].rendered)}"
+    }
+    PROT
+
 }
