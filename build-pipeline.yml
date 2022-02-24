@@ -25,7 +25,7 @@ jobs:
       provider: 'azurerm'
       workingDirectory: '$(System.DefaultWorkingDirectory)\Terraform\envs\dev'
       backendServiceArm: SC4TF
-      backendAzureRmResourceGroupName: 'rg_tfstate'
+      backendAzureRmResourceGroupName: 'infra-rg'
       backendAzureRmStorageAccountName: 'acctfstate'
       backendAzureRmContainerName: 'containertfstate'
       backendAzureRmKey: tf-uc3.tfstate
