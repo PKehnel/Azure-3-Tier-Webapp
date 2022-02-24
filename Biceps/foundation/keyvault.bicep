@@ -2,7 +2,6 @@
 targetScope = 'resourceGroup'
 
 // we get the details as parameters from main
-
 param vaultName string = 'infra-key-vault'
 param location string = resourceGroup().location
 
@@ -33,7 +32,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
         }
       }
     ]
-    tenantId: [subscription().tenantId]
+    tenantId: subscription().tenantId
     enabledForDeployment: true
     enabledForTemplateDeployment: true
     networkAcls: {
