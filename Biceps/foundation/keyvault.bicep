@@ -18,6 +18,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
     accessPolicies: [
       {
         objectId: '9b71ba09-202e-484c-95ad-7755b4fc5836'
+        tenantId: subscription().tenantId
         permissions: {
           certificates: [
             'all'
