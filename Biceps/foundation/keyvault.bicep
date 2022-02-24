@@ -2,7 +2,7 @@
 targetScope = 'resourceGroup'
 
 // we get the details as parameters from main
-param vaultName string = 'infra-key-vault-uit-case-3'
+param vaultName string
 param location string = resourceGroup().location
 
 //az ad user list for object id

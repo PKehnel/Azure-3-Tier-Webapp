@@ -10,7 +10,7 @@ variables:
   stgAccountRgName: 'rg_tfstate'
   stgAccountName: 'acctfstate'
   stgAccountContainerName: 'containert_fstate'
-  vaultName: 'infra-key-vault-uit-case-3'
+  vaultName: 'key-vault-uit-case-3'
 
 pool:
   vmImage: windows-latest
