@@ -25,9 +25,9 @@ jobs:
       provider: 'azurerm'
       workingDirectory: '$(System.DefaultWorkingDirectory)\Terraform\envs\dev'
       backendServiceArm: SC4TF
-      backendAzureRmResourceGroupName: 'rg-tfstate'
+      backendAzureRmResourceGroupName: 'rg_tfstate'
       backendAzureRmStorageAccountName: 'acctfstate'
-      backendAzureRmContainerName: 'container-tfstate'
+      backendAzureRmContainerName: 'container_tfstate'
       backendAzureRmKey: tf-uc3.tfstate
 
   - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
