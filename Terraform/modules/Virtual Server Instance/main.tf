@@ -195,13 +195,13 @@ data "azurerm_key_vault_secret" "azure_secret" {
 #}
 
 # Assign UAI to KV access policy
-resource "azurerm_key_vault_access_policy" "kvaccess" {
-  key_vault_id = data.azurerm_key_vault.infra-vault.id
-  tenant_id    = data.azurerm_client_config.current.tenant_id
-  object_id    = data.azurerm_client_config.current.object_id
-
-  secret_permissions = [
-    "Get", "List",
-  ]
-
-}
+#resource "azurerm_key_vault_access_policy" "kvaccess" {
+#  key_vault_id = data.azurerm_key_vault.infra-vault.id
+#  tenant_id    = data.azurerm_client_config.current.tenant_id
+#  object_id    = data.azurerm_client_config.current.object_id
+#
+#  secret_permissions = [
+#    "Get", "List",
+#  ]
+#
+#}

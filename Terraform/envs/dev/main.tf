@@ -86,7 +86,6 @@ module "Ansible" {
   env                  = var.env
   vm_size              = "Standard_DS1_v2"
   virtual_server_name  = "ansible"
-  virtual_server_count = var.webserver_count
   vm_image = {
     publisher = "RedHat"
     offer     = "RHEL"

@@ -6,7 +6,7 @@ variable "virtual_network_name" {}
 
 variable "subnet_name" { default = null }
 variable "virtual_server_name" { default = "webserver" }
-variable "virtual_server_count" { default = 2 }
+variable "virtual_server_count" { default = 1 }
 
 variable "log_ws_name" { default = "loganalyticsWS" }
 variable "script" { default = "install-upd-upg.sh" }
