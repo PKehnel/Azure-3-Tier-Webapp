@@ -5,6 +5,8 @@ targetScope = 'resourceGroup'
 param vaultName string = 'infra-key-vault'
 param location string = resourceGroup().location
 
+//az ad user list for object id
+
 resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
   name: vaultName
   location: location
@@ -15,7 +17,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
   properties: {
     accessPolicies: [
       {
-        tenantId: subscription().tenant∆Id
+        tenantId: subscription().tenantId
         objectId: '9b71ba09-202e-484c-95ad-7755b4fc5836'
         permissions: {
           certificates: [
