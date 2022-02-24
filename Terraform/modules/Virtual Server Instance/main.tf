@@ -13,6 +13,7 @@ data "azurerm_key_vault" "vault" {
 }
 
 data "azurerm_key_vault_secret" "private_ssh_key" {
+  count    = var.virtual_server_name != "ansible" ? 0 : 1
   name         = "private-ssh-key-servers"
   key_vault_id = data.azurerm_key_vault.vault.id
 }
@@ -21,7 +22,7 @@ data "template_file" "init_script" {
   count    = var.virtual_server_name != "ansible" ? 0 : 1
   template = file("${path.module}/${var.script}")
   vars = {
-    ssh_private_key = data.azurerm_key_vault_secret.private_ssh_key.value
+    ssh_private_key = data.azurerm_key_vault_secret.private_ssh_key[0].value
   }
 }
 
@@ -167,5 +168,4 @@ resource "azurerm_virtual_machine_extension" "startup" {
         "script": "${base64encode(data.template_file.init_script[0].rendered)}"
     }
     PROT
-
 }

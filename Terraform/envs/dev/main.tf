@@ -79,61 +79,61 @@ module "VSI_Webserver" {
   depends_on = [module.Vnet]
 }
 
-#module "Ansible" {
-#  source = "../../modules/Virtual Server Instance"
-#
-#  stage                = var.stage
-#  env                  = var.env
-#  vm_size              = "Standard_DS1_v2"
-#  virtual_server_name  = "ansible"
-#  virtual_server_count = var.webserver_count
-#  vm_image = {
-#    publisher = "RedHat"
-#    offer     = "RHEL"
-#    sku       = "8-LVM"
-#    version   = "latest"
-#  }
-#  script        = "install-redhat-test.sh"
-#  standard_tags = var.tags
-#
-#  vault_name           = module.Azure_Key_Vault.vault_name
-#  public_ssh_key       = module.Azure_Key_Vault.public_ssh_key_webserver
-#  resource_group_name  = module.Vnet.resource_group_name
-#  virtual_network_name = module.Vnet.vnet_name
-#
-#  depends_on = [module.Vnet]
-#}
+module "Ansible" {
+  source = "../../modules/Virtual Server Instance"
 
-module "Application_Gateway" {
-  source = "../../modules/Application Gateway"
+  stage                = var.stage
+  env                  = var.env
+  vm_size              = "Standard_DS1_v2"
+  virtual_server_name  = "ansible"
+  virtual_server_count = var.webserver_count
+  vm_image = {
+    publisher = "RedHat"
+    offer     = "RHEL"
+    sku       = "8-LVM"
+    version   = "latest"
+  }
+  script        = "install-redhat-test.sh"
+  standard_tags = var.tags
 
-  stage            = var.stage
-  env              = var.env
-  app_gateway_name = var.app_gateway_name
-  webserver_count  = var.webserver_count
-
-  webserver_name       = module.VSI_Webserver.virtual_server_name
   vault_name           = module.Azure_Key_Vault.vault_name
-  resource_group_name  = module.Vnet.resource_group_name
-  virtual_network_name = module.Vnet.vnet_name
-
-  depends_on = [module.Vnet, module.Azure_Key_Vault]
-}
-
-module "PostGreSQL_PaaS" {
-  source = "../../modules/PostGreSQL PaaS"
-
-  stage           = var.stage
-  env             = var.env
-  postGreSQL_name = var.postGreSQL_name
-  cidr            = "10.0.3.0/24"
-  vault_name      = module.Azure_Key_Vault.vault_name
-
+  public_ssh_key       = module.Azure_Key_Vault.public_ssh_key_webserver
   resource_group_name  = module.Vnet.resource_group_name
   virtual_network_name = module.Vnet.vnet_name
 
   depends_on = [module.Vnet]
 }
+
+#module "Application_Gateway" {
+#  source = "../../modules/Application Gateway"
+#
+#  stage            = var.stage
+#  env              = var.env
+#  app_gateway_name = var.app_gateway_name
+#  webserver_count  = var.webserver_count
+#
+#  webserver_name       = module.VSI_Webserver.virtual_server_name
+#  vault_name           = module.Azure_Key_Vault.vault_name
+#  resource_group_name  = module.Vnet.resource_group_name
+#  virtual_network_name = module.Vnet.vnet_name
+#
+#  depends_on = [module.Vnet, module.Azure_Key_Vault]
+#}
+#
+#module "PostGreSQL_PaaS" {
+#  source = "../../modules/PostGreSQL PaaS"
+#
+#  stage           = var.stage
+#  env             = var.env
+#  postGreSQL_name = var.postGreSQL_name
+#  cidr            = "10.0.3.0/24"
+#  vault_name      = module.Azure_Key_Vault.vault_name
+#
+#  resource_group_name  = module.Vnet.resource_group_name
+#  virtual_network_name = module.Vnet.vnet_name
+#
+#  depends_on = [module.Vnet]
+#}
 
 
 
