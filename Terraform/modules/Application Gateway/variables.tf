@@ -9,9 +9,6 @@ variable "subnet_name" { default = null }
 variable "app_gateway_name" { default = "app_gateway" }
 variable "webserver_count" {}
 
-
-
-
 variable "standard_tags" {
   default     = {}
   description = "Additional resource tags"

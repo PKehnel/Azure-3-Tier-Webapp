@@ -15,9 +15,8 @@ variable "standard_tags" {
 
 variable "subnets" {
   description = "subnets"
-  type        = list(object({
+  type = list(object({
     name_suffix = string
-    cidr = string
-    disable_private_endpoint_only = bool
+    cidr        = string
   }))
 }

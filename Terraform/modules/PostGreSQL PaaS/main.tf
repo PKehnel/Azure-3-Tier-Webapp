@@ -1,23 +1,51 @@
 locals {
-  naming_prefix       = "${var.env}-${var.stage}"
-  location            = data.azurerm_resource_group.rg.location
+  naming_prefix = "${var.env}-${var.stage}"
+  location      = data.azurerm_resource_group.rg.location
 }
 
 data "azurerm_resource_group" "rg" {
   name = var.resource_group_name
 }
 
-#Create the subnet that holds the db-servers
-data "azurerm_subnet" "subnet" {
-  name                 = "${local.naming_prefix}-subnet_${var.subnet_name != null ? var.subnet_name : var.postGreSQL_name}"
-  resource_group_name  = var.resource_group_name
-  virtual_network_name = var.virtual_network_name
+data "azurerm_virtual_network" "vnet" {
+  name                = var.virtual_network_name
+  resource_group_name = var.resource_group_name
 }
 
 data "azurerm_key_vault" "vault" {
   name                = var.vault_name
   resource_group_name = var.resource_group_name
 }
+
+resource "azurerm_subnet" "subnet" {
+  name                 = "${local.naming_prefix}-subnet_${var.postGreSQL_name}"
+  resource_group_name  = var.resource_group_name
+  virtual_network_name = var.virtual_network_name
+  address_prefixes     = [var.cidr]
+  service_endpoints    = ["Microsoft.Storage"]
+  delegation {
+    name = "delegation postgress zone"
+    service_delegation {
+      name = "Microsoft.DBforPostgreSQL/flexibleServers"
+      actions = [
+        "Microsoft.Network/virtualNetworks/subnets/join/action",
+      ]
+    }
+  }
+}
+
+resource "azurerm_private_dns_zone" "dns_zone" {
+  name                = "${var.postGreSQL_name}.postgres.database.azure.com"
+  resource_group_name = var.resource_group_name
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "virtual_network_link" {
+  name                  = "${local.naming_prefix}-virtual_network_link"
+  private_dns_zone_name = azurerm_private_dns_zone.dns_zone.name
+  virtual_network_id    = data.azurerm_virtual_network.vnet.id
+  resource_group_name   = var.resource_group_name
+}
+
 
 resource "random_string" "random_suffix" {
   length    = 4
@@ -26,46 +54,25 @@ resource "random_string" "random_suffix" {
   min_lower = 4
 }
 
-# Create the mySQL database as PaaS service. Must be General Purpose SKU to be able to use Private Link service
+# Create the PostGreSQL database as PaaS service.
+
 resource "azurerm_postgresql_flexible_server" "postGreSQL" {
-  # unique name is required
-  name                = "${local.naming_prefix}-postgresql-${random_string.random_suffix.result}"
+  name                = "${local.naming_prefix}-${var.postGreSQL_name}-${random_string.random_suffix.result}"
   location            = local.location
   resource_group_name = var.resource_group_name
 
-  sku_name   = "GP_Gen5_4"
-  version    = "9.6"
-  storage_mb = 640000
+  version                = "12"
+  administrator_login    = "${var.env}_${var.stage}_postgresql"
+  administrator_password = azurerm_key_vault_secret.postGreSQL_secret.value
+  zone                   = "1"
+  storage_mb             = 32768
+  sku_name               = "GP_Standard_D4s_v3"
 
-  backup_retention_days        = 7
-  geo_redundant_backup_enabled = true
-  auto_grow_enabled            = true
+  delegated_subnet_id = azurerm_subnet.subnet.id
+  private_dns_zone_id = azurerm_private_dns_zone.dns_zone.id
 
-  public_network_access_enabled    = false
-  ssl_enforcement_enabled          = true
-  ssl_minimal_tls_version_enforced = "TLS1_2"
-
-  # Apparently hyphens ("-") are not allowed in the name.
-  administrator_login           = "${var.env}_${var.stage}_postgresql"
-  administrator_login_password  = azurerm_key_vault_secret.postGreSQL_secret.value
-
+  depends_on = [azurerm_private_dns_zone_virtual_network_link.virtual_network_link]
   tags = var.standard_tags
-
-}
-
-# Create a private endpoint in the DB subnet and link it to the postGreSQL database
-resource "azurerm_private_endpoint" "ep_postGreSQL" {
-  name                = "${local.naming_prefix}-postGreSQL-endpoint"
-  location            = local.location
-  resource_group_name = var.resource_group_name
-  subnet_id           = data.azurerm_subnet.subnet.id
-
-  private_service_connection {
-    name                           = "${local.naming_prefix}-postGreSQL-privateserviceconnection"
-    private_connection_resource_id = azurerm_postgresql_server.postGreSQL.id
-    subresource_names              = ["postGreSQLServer"]
-    is_manual_connection           = false
-  }
 }
 
 # Generate a password for the postgres DB

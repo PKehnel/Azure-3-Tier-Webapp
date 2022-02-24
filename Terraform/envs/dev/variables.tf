@@ -1,4 +1,4 @@
-variable "azure_region" { default = "westeurope" }
+variable "azure_region" { default = "West Europe" }
 variable "env" { default = "case3" }
 variable "stage" { default = "dev" }
 variable "tags" {
@@ -8,6 +8,5 @@ variable "tags" {
 variable "webserver_name" { default = "webserver" }
 variable "webserver_count" { default = 1 }
 variable "app_gateway_name" { default = "app-gateway" }
-variable "postGreSQL_name" { default = "postGreSQL_db" }
+variable "postGreSQL_name" { default = "postgresql-db" }
 variable "bastionhost_name" { default = "BastionHost" }
-variable "postGreSQL_db_count" { default = 1 }

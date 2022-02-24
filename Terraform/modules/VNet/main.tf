@@ -43,15 +43,11 @@ resource "azurerm_virtual_network" "vnet" {
   resource_group_name = local.resource_group_name
 }
 
-# Create the subnets by iterating over the variable subnets
+# Create the subnets by iteratiÏng over the variable subnets
 resource "azurerm_subnet" "subnet" {
   for_each             = { for key, value in var.subnets : key => value }
   name                 = each.value.name_suffix != "AzureBastionSubnet" ? "${local.naming_prefix}-subnet_${each.value.name_suffix}" : "AzureBastionSubnet"
   address_prefixes     = [each.value.cidr]
   resource_group_name  = local.resource_group_name
   virtual_network_name = azurerm_virtual_network.vnet.name
-  # required to be set to true, when using NSG as they are not integrated atm
-  # https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet
-
-  enforce_private_link_endpoint_network_policies = each.value.disable_private_endpoint_only
 }

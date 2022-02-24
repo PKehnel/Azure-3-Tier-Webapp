@@ -124,7 +124,7 @@ resource "tls_private_key" "ssh_key" {
 }
 
 resource "azurerm_key_vault_secret" "private_ssh_key" {
-  name         = "private-ssh-key-servers"#"${local.naming_prefix}-private-ssh-key-${var.webserver_name}"
+  name         = "private-ssh-key-servers" #"${local.naming_prefix}-private-ssh-key-${var.webserver_name}"
   value        = tls_private_key.ssh_key.private_key_pem
   key_vault_id = azurerm_key_vault.vault.id
 }
