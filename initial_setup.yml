@@ -12,7 +12,7 @@ variables:
   stgAccountContainerName: 'container-tfstate'
 
 pool:
-  vmImageName: 'ubuntu-latest'
+  vmImage: windows-latest
 
 stages:
 - stage: Setup_Stg_Account
