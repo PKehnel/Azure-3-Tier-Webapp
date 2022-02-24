@@ -76,32 +76,32 @@ module "VSI_Webserver" {
   resource_group_name  = module.Vnet.resource_group_name
   virtual_network_name = module.Vnet.vnet_name
 
-  depends_on = [module.Vnet]
+  depends_on = [module.Vnet, module.Azure_Key_Vault]
 }
 
-module "Ansible" {
-  source = "../../modules/Virtual Server Instance"
-
-  stage                = var.stage
-  env                  = var.env
-  vm_size              = "Standard_DS1_v2"
-  virtual_server_name  = "ansible"
-  vm_image = {
-    publisher = "RedHat"
-    offer     = "RHEL"
-    sku       = "8-LVM"
-    version   = "latest"
-  }
-  script        = "install-ansible.sh"
-  standard_tags = var.tags
-
-  vault_name           = module.Azure_Key_Vault.vault_name
-  public_ssh_key       = module.Azure_Key_Vault.public_ssh_key_webserver
-  resource_group_name  = module.Vnet.resource_group_name
-  virtual_network_name = module.Vnet.vnet_name
-
-  depends_on = [module.Vnet]
-}
+#module "Ansible" {
+#  source = "../../modules/Virtual Server Instance"
+#
+#  stage                = var.stage
+#  env                  = var.env
+#  vm_size              = "Standard_DS1_v2"
+#  virtual_server_name  = "ansible"
+#  vm_image = {
+#    publisher = "RedHat"
+#    offer     = "RHEL"
+#    sku       = "8-LVM"
+#    version   = "latest"
+#  }
+#  script        = "install-ansible.sh"
+#  standard_tags = var.tags
+#
+#  vault_name           = module.Azure_Key_Vault.vault_name
+#  public_ssh_key       = module.Azure_Key_Vault.public_ssh_key_webserver
+#  resource_group_name  = module.Vnet.resource_group_name
+#  virtual_network_name = module.Vnet.vnet_name
+#
+#  depends_on = [module.Vnet, module.Azure_Key_Vault]
+#}
 
 module "Application_Gateway" {
   source = "../../modules/Application Gateway"
@@ -131,7 +131,7 @@ module "PostGreSQL_PaaS" {
   resource_group_name  = module.Vnet.resource_group_name
   virtual_network_name = module.Vnet.vnet_name
 
-  depends_on = [module.Vnet]
+  depends_on = [module.Vnet, module.Azure_Key_Vault]
 }
 
 
