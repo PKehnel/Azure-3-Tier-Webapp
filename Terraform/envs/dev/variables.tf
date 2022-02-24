@@ -6,7 +6,7 @@ variable "tags" {
 }
 
 variable "webserver_name" { default = "webserver" }
-variable "webserver_count" { default = 1 }
+variable "webserver_count" { default = 2 }
 variable "app_gateway_name" { default = "app-gateway" }
 variable "postGreSQL_name" { default = "postgresql-db" }
 variable "bastionhost_name" { default = "BastionHost" }

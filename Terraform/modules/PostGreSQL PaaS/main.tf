@@ -55,6 +55,9 @@ resource "random_string" "random_suffix" {
 }
 
 # Create the PostGreSQL database as PaaS service.
+# for connection options see under PostgreSQL Settings | Connection strings eg:
+# connect via: psql "host=case3-dev-postgresql-db-tbus.postgres.database.azure.com port=5432 dbname=postgres user=case3_dev_postgresql password={check vault} sslmode=require"
+# short tutorial https://docs.microsoft.com/en-us/sql/azure-data-studio/quickstart-postgres?view=sql-server-ver15
 
 resource "azurerm_postgresql_flexible_server" "postGreSQL" {
   name                = "${local.naming_prefix}-${var.postGreSQL_name}-${random_string.random_suffix.result}"

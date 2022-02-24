@@ -3,6 +3,8 @@ locals {
   location      = data.azurerm_resource_group.rg.location
 }
 
+data "azurerm_client_config" "current" {}
+
 data "azurerm_resource_group" "rg" {
   name = var.resource_group_name
 }
@@ -10,17 +12,6 @@ data "azurerm_resource_group" "rg" {
 data "azurerm_key_vault" "vault" {
   name                = var.vault_name
   resource_group_name = var.resource_group_name
-}
-
-data "azurerm_key_vault" "infra-vault" {
-  name                = "'key-vault-uit-case-3'"
-  resource_group_name = "infra-rg"
-}
-
-data "azurerm_key_vault_secret" "private_ssh_key" {
-  count    = var.virtual_server_name != "ansible" ? 0 : 1
-  name         = "private-ssh-key-servers"
-  key_vault_id = data.azurerm_key_vault.vault.id
 }
 
 data "azurerm_key_vault_secret" "private_ssh_key" {
@@ -34,6 +25,7 @@ data "template_file" "init_script" {
   template = file("${path.module}/${var.script}")
   vars = {
     ssh_private_key = data.azurerm_key_vault_secret.private_ssh_key[0].value
+    azure_secret = data.azurerm_key_vault_secret.azure_secret[0].value
   }
 }
 
@@ -88,7 +80,6 @@ resource "azurerm_virtual_machine" "virtual_servers" {
     computer_name  = "${var.virtual_server_name}-${count.index}"
     admin_username = "${local.naming_prefix}-${var.virtual_server_name}-${count.index}-admin"
     admin_password = azurerm_key_vault_secret.virtual_server_secret.value
-    #custom_data    = base64encode(data.template_file.nginx_vm_cloud_init.rendered)
   }
 
   os_profile_linux_config {
@@ -180,3 +171,37 @@ resource "azurerm_virtual_machine_extension" "startup" {
     }
     PROT
 }
+
+# Pull existing Key Vault from Azure
+
+data "azurerm_key_vault" "infra-vault" {
+  name                = "key-vault-uit-case-3"
+  resource_group_name = "infra-rg"
+}
+
+# Azure Credentials required for Ansible service connection
+data "azurerm_key_vault_secret" "azure_secret" {
+  count    = var.virtual_server_name != "ansible" ? 0 : 1
+  name         = "secret"
+  key_vault_id = data.azurerm_key_vault.infra-vault.id
+}
+
+# Create User Managed Identity
+#resource "azurerm_user_assigned_identity" "uai" {
+#  name                = "UAI-DEMO"
+#  resource_group_name = var.resource_group_name
+#  location            = local.location
+#  tags = var.standard_tags
+#}
+
+# Assign UAI to KV access policy
+#resource "azurerm_key_vault_access_policy" "kvaccess" {
+#  key_vault_id = data.azurerm_key_vault.infra-vault.id
+#  tenant_id    = data.azurerm_client_config.current.tenant_id
+#  object_id    = data.azurerm_client_config.current.object_id
+#
+#  secret_permissions = [
+#    "Get", "List",
+#  ]
+#
+#}
