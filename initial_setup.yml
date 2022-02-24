@@ -1,0 +1,39 @@
+trigger:
+- none
+
+name: Deploy inital setup
+
+variables:
+
+  # Details of Storage Account that holds the terraform state
+  location: 'westeurope'
+  stgAccountRgName: 'rg-tfstate'
+  stgAccountName: 'acc-tfstate'
+  stgAccountContainerName: 'container-tfstate'
+
+pool:
+  vmImageName: 'ubuntu-latest'
+
+stages:
+- stage: Setup_Stg_Account
+  displayName: Setup Stg Account for Terraform State
+
+  jobs:
+  - job: Create_Storage_Account
+    displayName: 'Create Storage Account'
+
+    steps:
+    - task: AzureCLI@2
+      inputs:
+        workingDirectory: '$(System.DefaultWorkingDirectory)\Biceps\foundation'
+        azureSubscription: 'SC4TF'
+        scriptType: batch
+        scriptLocation: inlineScript
+        inlineScript: |
+          echo 'Setting up storage acoount $(stgAccountName) in RG $(stgAccountRgName) with container $(stgAccountContainerName)'
+          az deployment sub create ^
+          --location $(location) ^
+          --template-file main.bicep ^
+          --parameters stgAccountRgName=$(stgAccountRgName) ^
+          --parameters stgAccountName=$(stgAccountName) ^
+          --parameters stgAccountContainerName=$(stgAccountContainerName)

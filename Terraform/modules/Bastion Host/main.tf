@@ -23,7 +23,7 @@ resource "azurerm_public_ip" "pip_bastion" {
   sku                 = "Standard"
 }
 
-#Create the bastion servie in the bastion subnet
+#Create the bastion service in the bastion subnet
 resource "azurerm_bastion_host" "bastion" {
   name                = "${local.naming_prefix}-${var.bastionhost_name}"
   location            = local.location
