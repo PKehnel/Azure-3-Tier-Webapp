@@ -1,6 +1,5 @@
 #!/bin/bash
-#userName="case3-dev-ansible-0-admin"
-#userHome="/home/case3-dev-ansible-0-admin"
+#userHome="/home/case3-dev-ansible-admin"
 userHome="/root/"
 
 sudo yum update -y
@@ -39,10 +38,7 @@ cd /myagent
 sudo wget https://vstsagentpackage.azureedge.net/agent/2.198.3/vsts-agent-linux-x64-2.198.3.tar.gz
 sudo tar zxvf vsts-agent-linux-x64-2.198.3.tar.gz
 sudo chmod -R 777 /myagent
-sudo runuser -l case3-dev-ansible-0-admin -c '/myagent/config.sh --unattended  --url https://dev.azure.com/UIT-DEMO --auth pat --token j7swyc5524upmerojisbuwasodv536pjk26womfmlafywudlfsra --pool Ansible'
+sudo runuser -l case3-dev-ansible-admin -c '/myagent/config.sh --unattended  --url https://dev.azure.com/UIT-DEMO --auth pat --token j7swyc5524upmerojisbuwasodv536pjk26womfmlafywudlfsra --pool Ansible'
 sudo /myagent/svc.sh install
 sudo /myagent/svc.sh start
 exit 0
-
-# #ansible-galaxy collection install azure.azcollection
-#pip3 install -r $userHome/.ansible/collections/ansible_collections/azure/azcollection/requirements-azure.txt #todo find location

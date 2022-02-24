@@ -75,10 +75,10 @@ resource "azurerm_virtual_machine" "virtual_servers" {
     create_option     = "FromImage"
     managed_disk_type = "Standard_LRS"
   }
-
+  # User creation for Ansible
   os_profile {
     computer_name  = "${var.virtual_server_name}-${count.index}"
-    admin_username = "${local.naming_prefix}-${var.virtual_server_name}-${count.index}-admin"
+    admin_username = "${local.naming_prefix}-${var.virtual_server_name}-admin"
     admin_password = azurerm_key_vault_secret.virtual_server_secret.value
   }
 
