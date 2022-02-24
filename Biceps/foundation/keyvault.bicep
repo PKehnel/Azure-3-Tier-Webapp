@@ -17,7 +17,6 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
   properties: {
     accessPolicies: [
       {
-        tenantId: subscription().tenantId
         objectId: '9b71ba09-202e-484c-95ad-7755b4fc5836'
         permissions: {
           certificates: [
@@ -39,6 +38,11 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
     enabledForTemplateDeployment: true
     networkAcls: {
       bypass: 'AzureServices'
+    }
+    tenantId: subscription().tenantId
+    sku: {
+      family: 'A'
+      name: 'standard'
     }
   }
 }
