@@ -21,3 +21,12 @@ module stg './storage.bicep' = {
     location:rg_state.location
   }
 }
+
+// Deploying key vault using module
+module keyvault './keyvault.bicep' = {
+  name: 'keyvaultDeployment'
+  scope: rg_state    // Deployed in the scope of resource group we created above
+  params: {
+    location:rg_state.location
+  }
+}
