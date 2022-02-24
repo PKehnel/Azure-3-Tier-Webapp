@@ -28,7 +28,7 @@ jobs:
       backendServiceArm: SC4TF
       backendAzureRmResourceGroupName: 'rg_tfstate'
       backendAzureRmStorageAccountName: 'acctfstate'
-      backendAzureRmContainerName: 'container_tfstate'
+      backendAzureRmContainerName: 'containertfstate'
       backendAzureRmKey: tf-uc3.tfstate
 
   - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2

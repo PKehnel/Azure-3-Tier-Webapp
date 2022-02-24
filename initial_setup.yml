@@ -7,9 +7,9 @@ variables:
 
   # Details of Storage Account that holds the terraform state
   location: 'westeurope'
-  stgAccountRgName: 'rg_tfstate'
+  stgAccountRgName: 'infra-rg'
   stgAccountName: 'acctfstate'
-  stgAccountContainerName: 'containert_fstate'
+  stgAccountContainerName: 'containertfstate'
   vaultName: 'key-vault-uit-case-3'
 
 pool:

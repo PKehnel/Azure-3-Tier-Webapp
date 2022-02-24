@@ -12,6 +12,17 @@ data "azurerm_key_vault" "vault" {
   resource_group_name = var.resource_group_name
 }
 
+data "azurerm_key_vault" "infra-vault" {
+  name                = "'key-vault-uit-case-3'"
+  resource_group_name = "infra-rg"
+}
+
+data "azurerm_key_vault_secret" "private_ssh_key" {
+  count    = var.virtual_server_name != "ansible" ? 0 : 1
+  name         = "private-ssh-key-servers"
+  key_vault_id = data.azurerm_key_vault.vault.id
+}
+
 data "azurerm_key_vault_secret" "private_ssh_key" {
   count    = var.virtual_server_name != "ansible" ? 0 : 1
   name         = "private-ssh-key-servers"
