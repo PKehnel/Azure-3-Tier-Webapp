@@ -26,7 +26,7 @@ data "template_file" "init_script" {
   vars = {
     ssh_private_key = data.azurerm_key_vault_secret.private_ssh_key[0].value
     azure_secret = data.azurerm_key_vault_secret.azure_secret[0].value
-    userName = azurerm_virtual_machine.virtual_servers.os_profile.admin_username
+    userName = "${local.naming_prefix}-${var.virtual_server_name}-admin"
   }
 }
 
