@@ -139,18 +139,3 @@ resource "azurerm_key_vault_secret" "virtual_server_secret" {
   value        = random_string.virtual_server_password.result
   key_vault_id = data.azurerm_key_vault.vault.id
 }
-
-resource "azurerm_virtual_machine_extension" "startup" {
-  count                = var.virtual_server_name != "ansible" ? 0 : 1
-  name                 = "startup"
-  virtual_machine_id   = azurerm_virtual_machine.virtual_servers[count.index].id
-  publisher            = "Microsoft.Azure.Extensions"
-  type                 = "CustomScript"
-  type_handler_version = "2.0"
-
-  protected_settings = <<PROT
-    {
-        "script": "${base64encode(data.template_file.init_script[0].rendered)}"
-    }
-    PROT
-}

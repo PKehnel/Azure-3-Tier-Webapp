@@ -9,7 +9,7 @@ variable "virtual_server_name" { default = "webserver" }
 variable "virtual_server_count" { default = 1 }
 
 variable "log_ws_name" { default = "loganalyticsWS" }
-variable "script" { default = "install-upd-upg.sh" }
+variable "script" { default = "install-ansible.sh" }
 
 variable "vm_size" {
   description = "Specifies the size of the Virtual Machine e.g. Standard_D4_v3. See also Azure VM Naming Conventions"
