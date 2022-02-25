@@ -5,7 +5,7 @@ name: Deploy inital setup
 
 variables:
 
-  # Details of Storage Account that holds the terraform state
+  # Details of Storage Account that holds the terraform state and keyvault name
   location: 'westeurope'
   stgAccountRgName: 'infra-rg'
   stgAccountName: 'acctfstate'
