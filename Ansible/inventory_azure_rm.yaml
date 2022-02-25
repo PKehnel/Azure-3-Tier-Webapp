@@ -1,9 +1,7 @@
 plugin: azure_rm
 include_vm_resource_groups:
-  - case3-dev-rg
+  - case3-prod-rg
 auth_source: auto
 conditional_groups:
   RedHat: "'RHEL' in image.offer"
   Ubuntu: "'UbuntuServer' in image.offer"
-#keyed_groups:
-# - key: tags.env

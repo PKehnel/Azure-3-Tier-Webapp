@@ -3,6 +3,8 @@ locals {
   location      = data.azurerm_resource_group.rg.location
 }
 
+data "azurerm_client_config" "current" {}
+
 data "azurerm_resource_group" "rg" {
   name = var.resource_group_name
 }
@@ -13,6 +15,7 @@ data "azurerm_key_vault" "vault" {
 }
 
 data "azurerm_key_vault_secret" "private_ssh_key" {
+  count    = var.virtual_server_name != "ansible" ? 0 : 1
   name         = "private-ssh-key-servers"
   key_vault_id = data.azurerm_key_vault.vault.id
 }
@@ -21,7 +24,9 @@ data "template_file" "init_script" {
   count    = var.virtual_server_name != "ansible" ? 0 : 1
   template = file("${path.module}/${var.script}")
   vars = {
-    ssh_private_key = data.azurerm_key_vault_secret.private_ssh_key.value
+    ssh_private_key = data.azurerm_key_vault_secret.private_ssh_key[0].value
+    azure_secret = data.azurerm_key_vault_secret.azure_secret[0].value
+    userName = "${local.naming_prefix}-${var.virtual_server_name}-admin"
   }
 }
 
@@ -52,7 +57,7 @@ resource "azurerm_virtual_machine" "virtual_servers" {
   location              = local.location
   resource_group_name   = var.resource_group_name
   availability_set_id   = azurerm_availability_set.avset.id
-  network_interface_ids = [element(azurerm_network_interface.nic_webservers.*.id, count.index)]
+  network_interface_ids = [element(azurerm_network_interface.nic.*.id, count.index)]
   vm_size               = var.vm_size
 
   # Delete the OS disk automatically when deleting the VM
@@ -71,19 +76,18 @@ resource "azurerm_virtual_machine" "virtual_servers" {
     create_option     = "FromImage"
     managed_disk_type = "Standard_LRS"
   }
-
+  # User creation for Ansible
   os_profile {
     computer_name  = "${var.virtual_server_name}-${count.index}"
-    admin_username = "${local.naming_prefix}-${var.virtual_server_name}-${count.index}-admin"
+    admin_username = "${local.naming_prefix}-${var.virtual_server_name}-admin"
     admin_password = azurerm_key_vault_secret.virtual_server_secret.value
-    #custom_data    = base64encode(data.template_file.nginx_vm_cloud_init.rendered)
   }
 
   os_profile_linux_config {
     disable_password_authentication = false
     ssh_keys {
       key_data = var.public_ssh_key
-      path     = "/home/${local.naming_prefix}-${var.virtual_server_name}-${count.index}-admin/.ssh/authorized_keys"
+      path     = "/home/${local.naming_prefix}-${var.virtual_server_name}-admin/.ssh/authorized_keys"
     }
   }
 
@@ -94,9 +98,9 @@ resource "azurerm_virtual_machine" "virtual_servers" {
 }
 
 # Create FrontEnd NICs for the webservers in the web subnet
-resource "azurerm_network_interface" "nic_webservers" {
+resource "azurerm_network_interface" "nic" {
   count               = var.virtual_server_count
-  name                = "webnic-${local.naming_prefix}-${var.virtual_server_name}-${count.index}"
+  name                = "nic-${local.naming_prefix}-${var.virtual_server_name}-${count.index}"
   location            = local.location
   resource_group_name = var.resource_group_name
 
@@ -167,5 +171,38 @@ resource "azurerm_virtual_machine_extension" "startup" {
         "script": "${base64encode(data.template_file.init_script[0].rendered)}"
     }
     PROT
-
 }
+
+# Pull existing Key Vault from Azure
+
+data "azurerm_key_vault" "infra-vault" {
+  name                = "key-vault-uit-case-3"
+  resource_group_name = "infra-rg"
+}
+
+# Azure Credentials required for Ansible service connection
+data "azurerm_key_vault_secret" "azure_secret" {
+  count    = var.virtual_server_name != "ansible" ? 0 : 1
+  name         = "secret"
+  key_vault_id = data.azurerm_key_vault.infra-vault.id
+}
+
+# Create User Managed Identity
+#resource "azurerm_user_assigned_identity" "uai" {
+#  name                = "UAI-DEMO"
+#  resource_group_name = var.resource_group_name
+#  location            = local.location
+#  tags = var.standard_tags
+#}
+
+# Assign UAI to KV access policy
+#resource "azurerm_key_vault_access_policy" "kvaccess" {
+#  key_vault_id = data.azurerm_key_vault.infra-vault.id
+#  tenant_id    = data.azurerm_client_config.current.tenant_id
+#  object_id    = data.azurerm_client_config.current.object_id
+#
+#  secret_permissions = [
+#    "Get", "List",
+#  ]
+#
+#}
