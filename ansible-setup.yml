@@ -15,6 +15,6 @@ steps:
   displayName: 'Run playbook'
   inputs:
     playbookPathOnAgentMachine: '$(System.DefaultWorkingDirectory)/Ansible/playbook.yaml'
-    failOnStdErr: false
+    #failOnStdErr: false
     inventoriesAgentMachine: file
     inventoryFileOnAgentMachine: '$(System.DefaultWorkingDirectory)/Ansible/inventory_azure_rm.yaml'

@@ -1,8 +1,8 @@
 variable "azure_region" { default = "West Europe" }
 variable "env" { default = "case3" }
-variable "stage" { default = "test" }
+variable "stage" { default = "prod" }
 variable "tags" {
-  default = { env = "case3", stage = "test" }
+  default = { env = "case3", stage = "prod" }
 }
 
 variable "webserver_name" { default = "webserver" }

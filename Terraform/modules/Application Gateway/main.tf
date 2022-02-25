@@ -152,7 +152,7 @@ resource "azurerm_application_gateway" "appgw" {
 
 data "azurerm_network_interface" "nic_webservers" {
   count               = var.webserver_count
-  name                = "webnic-${var.webserver_name[count.index]}"
+  name                = "nic-${var.webserver_name[count.index]}"
   resource_group_name = var.resource_group_name
 }
 

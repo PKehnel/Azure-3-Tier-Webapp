@@ -26,6 +26,7 @@ data "template_file" "init_script" {
   vars = {
     ssh_private_key = data.azurerm_key_vault_secret.private_ssh_key[0].value
     azure_secret = data.azurerm_key_vault_secret.azure_secret[0].value
+    userName = azurerm_virtual_machine.virtual_servers.os_profile.admin_username
   }
 }
 
@@ -56,7 +57,7 @@ resource "azurerm_virtual_machine" "virtual_servers" {
   location              = local.location
   resource_group_name   = var.resource_group_name
   availability_set_id   = azurerm_availability_set.avset.id
-  network_interface_ids = [element(azurerm_network_interface.nic_webservers.*.id, count.index)]
+  network_interface_ids = [element(azurerm_network_interface.nic.*.id, count.index)]
   vm_size               = var.vm_size
 
   # Delete the OS disk automatically when deleting the VM
@@ -97,9 +98,9 @@ resource "azurerm_virtual_machine" "virtual_servers" {
 }
 
 # Create FrontEnd NICs for the webservers in the web subnet
-resource "azurerm_network_interface" "nic_webservers" {
+resource "azurerm_network_interface" "nic" {
   count               = var.virtual_server_count
-  name                = "webnic-${local.naming_prefix}-${var.virtual_server_name}-${count.index}"
+  name                = "nic-${local.naming_prefix}-${var.virtual_server_name}-${count.index}"
   location            = local.location
   resource_group_name = var.resource_group_name
 
