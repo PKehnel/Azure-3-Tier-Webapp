@@ -15,17 +15,15 @@ data "azurerm_key_vault" "vault" {
 }
 
 data "azurerm_key_vault_secret" "private_ssh_key" {
-  count    = var.virtual_server_name != "ansible" ? 0 : 1
   name         = "private-ssh-key-servers"
   key_vault_id = data.azurerm_key_vault.vault.id
 }
 
 data "template_file" "init_script" {
-  count    = var.virtual_server_name != "ansible" ? 0 : 1
   template = file("${path.module}/${var.script}")
   vars = {
-    ssh_private_key = data.azurerm_key_vault_secret.private_ssh_key[0].value
-    azure_secret = data.azurerm_key_vault_secret.azure_secret[0].value
+    ssh_private_key = data.azurerm_key_vault_secret.private_ssh_key.value
+    azure_secret = data.azurerm_key_vault_secret.azure_secret.value
     userName = "${local.naming_prefix}-${var.virtual_server_name}-admin"
   }
 }
@@ -41,23 +39,11 @@ data "azurerm_subnet" "subnet" {
   virtual_network_name = var.virtual_network_name
 }
 
-#Create an availability set with two fault/update domains, so each webserver is placed into its own domain
-resource "azurerm_availability_set" "avset" {
-  name                         = "${local.naming_prefix}-${var.virtual_server_name}-avset"
-  resource_group_name          = var.resource_group_name
-  location                     = local.location
-  platform_fault_domain_count  = 2
-  platform_update_domain_count = 2
-  managed                      = true
-}
-
 resource "azurerm_virtual_machine" "virtual_servers" {
-  count                 = var.virtual_server_count
-  name                  = "${local.naming_prefix}-${var.virtual_server_name}-${count.index}"
+  name                  = "${local.naming_prefix}-${var.virtual_server_name}"
   location              = local.location
   resource_group_name   = var.resource_group_name
-  availability_set_id   = azurerm_availability_set.avset.id
-  network_interface_ids = [element(azurerm_network_interface.nic.*.id, count.index)]
+  network_interface_ids = [azurerm_network_interface.nic.id]
   vm_size               = var.vm_size
 
   # Delete the OS disk automatically when deleting the VM
@@ -71,14 +57,14 @@ resource "azurerm_virtual_machine" "virtual_servers" {
   }
 
   storage_os_disk {
-    name              = "disk-${count.index}-${var.virtual_server_name}"
+    name              = "disk-${var.virtual_server_name}"
     caching           = "ReadWrite"
     create_option     = "FromImage"
     managed_disk_type = "Standard_LRS"
   }
   # User creation for Ansible
   os_profile {
-    computer_name  = "${var.virtual_server_name}-${count.index}"
+    computer_name  = var.virtual_server_name
     admin_username = "${local.naming_prefix}-${var.virtual_server_name}-admin"
     admin_password = azurerm_key_vault_secret.virtual_server_secret.value
   }
@@ -99,8 +85,7 @@ resource "azurerm_virtual_machine" "virtual_servers" {
 
 # Create FrontEnd NICs for the webservers in the web subnet
 resource "azurerm_network_interface" "nic" {
-  count               = var.virtual_server_count
-  name                = "nic-${local.naming_prefix}-${var.virtual_server_name}-${count.index}"
+  name                = "nic-${local.naming_prefix}-${var.virtual_server_name}"
   location            = local.location
   resource_group_name = var.resource_group_name
 
@@ -112,9 +97,8 @@ resource "azurerm_network_interface" "nic" {
 }
 
 resource "azurerm_virtual_machine_extension" "vm_ext_web" {
-  count                      = var.virtual_server_count
   name                       = "OmsAgentForLinux"
-  virtual_machine_id         = azurerm_virtual_machine.virtual_servers[count.index].id
+  virtual_machine_id         = azurerm_virtual_machine.virtual_servers.id
   publisher                  = "Microsoft.EnterpriseCloud.Monitoring"
   type                       = "OmsAgentForLinux"
   type_handler_version       = "1.12"
@@ -134,9 +118,8 @@ resource "azurerm_virtual_machine_extension" "vm_ext_web" {
 }
 
 resource "azurerm_virtual_machine_extension" "da_web" {
-  count                      = var.virtual_server_count
   name                       = "DAExtension"
-  virtual_machine_id         = azurerm_virtual_machine.virtual_servers[count.index].id
+  virtual_machine_id         = azurerm_virtual_machine.virtual_servers.id
   publisher                  = "Microsoft.Azure.Monitoring.DependencyAgent"
   type                       = "DependencyAgentLinux"
   type_handler_version       = "9.5"
@@ -159,16 +142,15 @@ resource "azurerm_key_vault_secret" "virtual_server_secret" {
 }
 
 resource "azurerm_virtual_machine_extension" "startup" {
-  count                = var.virtual_server_name != "ansible" ? 0 : 1
   name                 = "startup"
-  virtual_machine_id   = azurerm_virtual_machine.virtual_servers[count.index].id
+  virtual_machine_id   = azurerm_virtual_machine.virtual_servers.id
   publisher            = "Microsoft.Azure.Extensions"
   type                 = "CustomScript"
   type_handler_version = "2.0"
 
   protected_settings = <<PROT
     {
-        "script": "${base64encode(data.template_file.init_script[0].rendered)}"
+        "script": "${base64encode(data.template_file.init_script.rendered)}"
     }
     PROT
 }
@@ -182,7 +164,6 @@ data "azurerm_key_vault" "infra-vault" {
 
 # Azure Credentials required for Ansible service connection
 data "azurerm_key_vault_secret" "azure_secret" {
-  count    = var.virtual_server_name != "ansible" ? 0 : 1
   name         = "secret"
   key_vault_id = data.azurerm_key_vault.infra-vault.id
 }

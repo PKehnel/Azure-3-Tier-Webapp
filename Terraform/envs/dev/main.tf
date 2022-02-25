@@ -62,7 +62,7 @@ module "Bastion_Host" {
 }
 
 module "VSI_Webserver" {
-  source = "../../modules/Virtual Server Instance"
+  source = "../../modules/Webserver Instance"
 
   stage                = var.stage
   env                  = var.env
@@ -80,7 +80,7 @@ module "VSI_Webserver" {
 }
 
 module "Ansible" {
-  source = "../../modules/Virtual Server Instance"
+  source = "../../modules/Ansible Host"
 
   stage                = var.stage
   env                  = var.env
