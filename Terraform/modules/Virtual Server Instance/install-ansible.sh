@@ -38,7 +38,9 @@ cd /myagent
 sudo wget https://vstsagentpackage.azureedge.net/agent/2.198.3/vsts-agent-linux-x64-2.198.3.tar.gz
 sudo tar zxvf vsts-agent-linux-x64-2.198.3.tar.gz
 sudo chmod -R 777 /myagent
-sudo runuser -l case3-dev-ansible-admin -c '/myagent/config.sh --unattended  --url https://dev.azure.com/UIT-DEMO --auth pat --token j7swyc5524upmerojisbuwasodv536pjk26womfmlafywudlfsra --pool Ansible'
+sudo runuser -l case3-test-ansible-admin -c '/myagent/config.sh --unattended  --url https://dev.azure.com/UIT-DEMO --auth pat --token j7swyc5524upmerojisbuwasodv536pjk26womfmlafywudlfsra --pool Ansible'
 sudo /myagent/svc.sh install
 sudo /myagent/svc.sh start
 exit 0
+
+#todo swap -l username with input param
