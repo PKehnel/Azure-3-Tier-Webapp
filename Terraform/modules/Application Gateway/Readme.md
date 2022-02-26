@@ -1,4 +1,4 @@
-#Application Gateway
+# Application Gateway
 
 The Application Gateway is placed in front of the webservers and distributes the webtraffic.
 
@@ -15,7 +15,7 @@ Traditional load balancers operate at the transport layer (OSI layer 4 - TCP and
 - easily integrate WAF
 - 80 / 443 ag perfect
 
-###Localhost vs Hosted:
+### Localhost vs Hosted:
 
 We decided to use an Ansible host instead of running the playbooks locally. 
 There are some advantages of running the playbooks local:
