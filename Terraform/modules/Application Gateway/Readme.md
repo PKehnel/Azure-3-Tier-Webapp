@@ -1,4 +1,5 @@
 #Application Gateway
+
 The Application Gateway is placed in front of the webservers and distributes the webtraffic.
 
 The binding happens in the resource: `azurerm_network_interface_application_gateway_backend_address_pool_association`
