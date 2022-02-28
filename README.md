@@ -17,6 +17,7 @@ Terraform Module to provision IaaS in MS Azure
 
 ### Basic usage
 
+- pushing to main only from Dev
 - go the [dev](Terraform/envs/dev) or [prod](Terraform/envs/prod) environment
 - configure the main to your preference or use the standard config matching the above displayed use case
 - run terraform commands:
