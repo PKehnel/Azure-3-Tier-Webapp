@@ -9,7 +9,7 @@ Terraform Module to provision IaaS in MS Azure
 
 ---
 
-##Infrastructure
+## Infrastructure
 
 ![Architecture Overview](Documentation/images/UC3-Architecture.jpg?raw=true "Architecture Overview")
 
@@ -20,9 +20,9 @@ Terraform Module to provision IaaS in MS Azure
 - go the [dev](Terraform/envs/dev) or [prod](Terraform/envs/prod) environment
 - configure the main to your preference or use the standard config matching the above displayed use case
 - run terraform commands:
-    - `terraform init`
-    - `terraform plan`
-    - `terraform apply`
+  - `terraform init`
+  - `terraform plan`
+  - `terraform apply`
 
 - when running the project with remote state file, configure via azure.conf and provider.tf
 - for pipeline usage see the [Documentation Folder](/Documentation).
