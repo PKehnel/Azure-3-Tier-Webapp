@@ -1,5 +1,3 @@
-# https://github.com/aquasecurity/tfsec
-
 name: tfsec-pr-commenter
 on:
   pull_request:
