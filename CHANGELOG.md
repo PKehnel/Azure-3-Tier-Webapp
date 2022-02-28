@@ -13,3 +13,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved Ansible and Webserver in 2 different modules. Even if this is partly duplicate code it makes more sense and is
 easier to read and understand. 
 - verified that we use CIS hardened images (Ubuntu 18.04 LTS) for the webservers (See azure Marketplace: Ubuntu Pro 18.04 LTS)
+- added a Readme.md to all modules giving a brief overview
