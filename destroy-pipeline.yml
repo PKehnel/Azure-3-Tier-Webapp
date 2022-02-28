@@ -4,7 +4,7 @@
 # https://aka.ms/yaml
 
 trigger:
-- none
+  - none
 
 pool:
   vmImage: windows-latest
@@ -13,28 +13,28 @@ pool:
 
 
 jobs:
-- job: UseCase3
-  displayName: 'Destroy Use Case 3 Infra'
+  - job: UseCase3
+    displayName: 'Destroy Use Case 3 Infra'
 
-  steps:
-  - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
-    displayName: Install Terraform
+    steps:
+      - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
+        displayName: Install Terraform
 
-  - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
-    displayName: 'Terraform : Init'
-    inputs:
-      provider: 'azurerm'
-      workingDirectory: '$(System.DefaultWorkingDirectory)\Terraform\envs\dev'
-      backendServiceArm: SC4TF
-      backendAzureRmResourceGroupName: 'infra-rg'
-      backendAzureRmStorageAccountName: 'acctfstate'
-      backendAzureRmContainerName: 'containertfstate'
-      backendAzureRmKey: tf-uc3.tfstate
+      - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
+        displayName: 'Terraform : Init'
+        inputs:
+          provider: 'azurerm'
+          workingDirectory: '$(System.DefaultWorkingDirectory)\Terraform\envs\dev'
+          backendServiceArm: SC4TF
+          backendAzureRmResourceGroupName: 'rg-uit-tfstate'
+          backendAzureRmStorageAccountName: 'stgaccuittfstate'
+          backendAzureRmContainerName: 'stgcont-uit-tfstate'
+          backendAzureRmKey: tf-uc3-test.tfstate
 
-  - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
-    displayName: 'Terraform : Destroy'
-    inputs:
-      command: destroy
-      workingDirectory: '$(System.DefaultWorkingDirectory)\Terraform\envs\dev'
-      environmentServiceNameAzureRM: SC4TF
+      - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
+        displayName: 'Terraform : Destroy'
+        inputs:
+          command: destroy
+          workingDirectory: '$(System.DefaultWorkingDirectory)\Terraform\envs\dev'
+          environmentServiceNameAzureRM: SC4TF
 
