@@ -1,8 +1,7 @@
 # Azure Key Vault
 
-The Key Vault module stores secrets and certificates for the environment. 
-The permissions are set following the principle of least privilege.
-All used credentials are supposed to be created and stored with the module.
+The Key Vault module stores secrets and certificates for the environment. The permissions are set following the
+principle of least privilege. All used credentials are supposed to be created and stored with the module.
 
 ### Notes:
 

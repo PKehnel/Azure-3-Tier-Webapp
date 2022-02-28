@@ -1,12 +1,11 @@
 # PostGreSQL
 
-PostgreSQL - Flexible Server is a fully managed PostgreSQL database.
-Its deployed in the same Vnet as the other services, allowing connecting by using private IP addresses.
+PostgreSQL - Flexible Server is a fully managed PostgreSQL database. Its deployed in the same Vnet as the other
+services, allowing connecting by using private IP addresses.
 
 Background info: https://docs.microsoft.com/en-us/azure/postgresql/flexible-server/
 
 Networking: https://docs.microsoft.com/en-us/azure/postgresql/flexible-server/concepts-networking
-
 
 ### Notes:
 
