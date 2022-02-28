@@ -21,3 +21,4 @@ easier to read and understand.
 - improving overall security by following the Securtiy Principle least privilege for Keyvault, Service Principals, ... 
   - network security groups vs application security groups
   - Network (whiteliste, private endpoint only, network segregation)
+- added a Readme.md to all modules giving a brief overview
