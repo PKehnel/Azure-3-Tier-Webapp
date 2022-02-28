@@ -28,7 +28,7 @@ jobs:
           backendAzureRmResourceGroupName: 'rg-uit-tfstate'
           backendAzureRmStorageAccountName: 'stgaccuittfstate'
           backendAzureRmContainerName: 'stgcont-uit-tfstate'
-          backendAzureRmKey: tf-uc3-test.tfstate
+          backendAzureRmKey: tf-uc3-dev.tfstate
 
       - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
         displayName: 'Terraform : Plan'
