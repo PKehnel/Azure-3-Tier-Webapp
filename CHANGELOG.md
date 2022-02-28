@@ -18,7 +18,11 @@ easier to read and understand.
 ### Added
 - setup Github actions for Code formatting and security topics (super-linter and tfsec)
 - Added readme to all tf modules, ansible and biceps
+- added a Readme.md to all modules giving a brief overview
+- pipelines in a state that they run out of the box on a new account
+
+
+## [1.1.5] TODO
 - improving overall security by following the Securtiy Principle least privilege for Keyvault, Service Principals, ... 
   - network security groups vs application security groups
   - Network (whiteliste, private endpoint only, network segregation)
-- added a Readme.md to all modules giving a brief overview
