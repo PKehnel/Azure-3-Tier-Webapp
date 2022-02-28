@@ -1,5 +1,6 @@
 trigger:
   - none
+pr: none # Disable pull request triggers.
 
 name: Deploy inital setup
 

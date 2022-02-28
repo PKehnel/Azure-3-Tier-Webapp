@@ -6,6 +6,8 @@
 trigger:
   - none
 
+pr: none # Disable pull request triggers.
+
 pool:
   vmImage: windows-latest
   #name: Default
