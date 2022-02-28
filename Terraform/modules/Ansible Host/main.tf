@@ -21,10 +21,14 @@ data "azurerm_key_vault_secret" "private_ssh_key" {
 
 data "template_file" "init_script" {
   template = file("${path.module}/${var.script}")
-  vars = {
+  vars     = {
     ssh_private_key = data.azurerm_key_vault_secret.private_ssh_key.value
-    azure_secret = data.azurerm_key_vault_secret.azure_secret.value
-    userName = "${local.naming_prefix}-${var.virtual_server_name}-admin"
+    secret          = data.azurerm_key_vault_secret.azure_credentials_secret
+    subscription_id = data.azurerm_key_vault_secret.azure_credentials_subscription_id
+    client_id       = data.azurerm_key_vault_secret.azure_credentials_client_id
+    tenant          = data.azurerm_key_vault_secret.azure_credentials_tenant
+    pat_token       = data.azurerm_key_vault_secret.Devops_PAT
+    userName        = "${local.naming_prefix}-${var.virtual_server_name}-admin"
   }
 }
 
@@ -163,10 +167,31 @@ data "azurerm_key_vault" "infra-vault" {
 }
 
 # Azure Credentials required for Ansible service connection
-data "azurerm_key_vault_secret" "azure_secret" {
+data "azurerm_key_vault_secret" "azure_credentials_secret" {
   name         = "secret"
   key_vault_id = data.azurerm_key_vault.infra-vault.id
 }
+
+data "azurerm_key_vault_secret" "azure_credentials_subscription_id" {
+  name         = "subscriptionid"
+  key_vault_id = data.azurerm_key_vault.infra-vault.id
+}
+
+data "azurerm_key_vault_secret" "azure_credentials_client_id" {
+  name         = "clientid"
+  key_vault_id = data.azurerm_key_vault.infra-vault.id
+}
+
+data "azurerm_key_vault_secret" "azure_credentials_tenant" {
+  name         = "tenant"
+  key_vault_id = data.azurerm_key_vault.infra-vault.id
+}
+
+data "azurerm_key_vault_secret" "Devops_PAT" {
+  name         = "pattoken"
+  key_vault_id = data.azurerm_key_vault.infra-vault.id
+}
+
 
 # Create User Managed Identity
 #resource "azurerm_user_assigned_identity" "uai" {

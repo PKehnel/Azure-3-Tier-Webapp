@@ -12,10 +12,10 @@ pip3 install ansible[azure]
 sudo mkdir $userHome.azure
 sudo cat << EOF | sudo tee $userHome.azure/credentials
 [default]
-subscription_id=b930202f-9e27-40c2-b275-03609596ad3b
-client_id=f1ba5d01-003f-4549-9fe8-2f223bb4ba22
-secret=${azure_secret}
-tenant=e205499b-d99a-415a-9534-683ac582c1c5
+subscription_id=${subscription_id}
+client_id=${client_id}
+secret=${secret}
+tenant=${tenant}
 EOF
 
 # ssh key
@@ -38,7 +38,7 @@ cd /myagent
 sudo wget https://vstsagentpackage.azureedge.net/agent/2.198.3/vsts-agent-linux-x64-2.198.3.tar.gz
 sudo tar zxvf vsts-agent-linux-x64-2.198.3.tar.gz
 sudo chmod -R 777 /myagent
-sudo runuser -l "${userName}" -c '/myagent/config.sh --unattended  --url https://dev.azure.com/UIT-DEMO --auth pat --token j7swyc5524upmerojisbuwasodv536pjk26womfmlafywudlfsra --pool Ansible'
+sudo runuser -l "${userName}" -c '/myagent/config.sh --unattended  --url https://dev.azure.com/UIT-DEMO --auth pat --token ${pat_token} --pool Ansible'
 sudo /myagent/svc.sh install
 sudo /myagent/svc.sh start
 exit 0
