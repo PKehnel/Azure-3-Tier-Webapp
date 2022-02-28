@@ -8,7 +8,7 @@ jobs:
 
     steps:
       - name: Clone repo
-        uses: actions/checkout@master
+        uses: actions/checkout@v2
       - name: tfsec
         uses: aquasecurity/tfsec-pr-commenter-action@v1.0.2
         with:

@@ -4,16 +4,16 @@
 # https://aka.ms/yaml
 
 trigger:
-- none # Dev
+  - none
 
 pool:
   name: Ansible
 
 steps:
-- task: ms-vscs-rm.vss-services-ansible.ansible-task.Ansible@0
-  displayName: 'Run playbook'
-  inputs:
-    playbookPathOnAgentMachine: '$(System.DefaultWorkingDirectory)/Ansible/playbook.yaml'
-    failOnStdErr: false
-    inventoriesAgentMachine: file
-    inventoryFileOnAgentMachine: '$(System.DefaultWorkingDirectory)/Ansible/inventory_azure_rm.yaml'
+  - task: ms-vscs-rm.vss-services-ansible.ansible-task.Ansible@0
+    displayName: 'Run playbook'
+    inputs:
+      playbookPathOnAgentMachine: '$(System.DefaultWorkingDirectory)/Ansible/playbook.yaml'
+      failOnStdErr: false
+      inventoriesAgentMachine: file
+      inventoryFileOnAgentMachine: '$(System.DefaultWorkingDirectory)/Ansible/inventory_azure_rm.yaml'
