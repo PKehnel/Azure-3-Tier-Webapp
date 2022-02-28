@@ -6,7 +6,7 @@ locals {
 
 # Create a resource group to hold all the resources
 resource "azurerm_resource_group" "rg" {
-  name     = "${local.naming_prefix}-rg"
+  name     = "rg-uit-${local.naming_prefix}"
   location = var.azure_region
   tags = merge(var.standard_tags,
   { type = "DemoEnv" }, )
