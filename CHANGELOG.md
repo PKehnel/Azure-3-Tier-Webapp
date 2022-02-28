@@ -13,3 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved Ansible and Webserver in 2 different modules. Even if this is partly duplicate code it makes more sense and is
 easier to read and understand. 
 - verified that we use CIS hardened images (Ubuntu 18.04 LTS) for the webservers (See azure Marketplace: Ubuntu Pro 18.04 LTS)
+
+## [1.1.4] - 2022-02-28
+### Added
+- setup Github actions for Code formatting and security topics (super-linter and tfsec)
+- Added readme to all tf modules, ansible and biceps
+- improving overall security by following the Securtiy Principle least privilege for Keyvault, Service Principals, ... 
+  - network security groups vs application security groups
+  - Network (whiteliste, private endpoint only, network segregation)
