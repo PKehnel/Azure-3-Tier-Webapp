@@ -4,8 +4,7 @@
 # https://aka.ms/yaml
 
 trigger:
-- none
-- #PipelineWorking
+- Dev
 
 pool:
   name: Ansible
