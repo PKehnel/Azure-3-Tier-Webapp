@@ -158,8 +158,8 @@ resource "azurerm_virtual_machine_extension" "startup" {
 # Pull existing Key Vault from Azure
 
 data "azurerm_key_vault" "infra-vault" {
-  name                = "key-vault-uit-case-3"
-  resource_group_name = "infra-rg"
+  name                = "key-vault-uit-case3"
+  resource_group_name = "rg-uit-tfstate"
 }
 
 # Azure Credentials required for Ansible service connection
