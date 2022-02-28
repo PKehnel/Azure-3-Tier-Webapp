@@ -1,6 +1,7 @@
+---
 plugin: azure_rm
 include_vm_resource_groups:
-  - case3-prod-rg
+  - "rg-uit-{{env}}-{{stage}}"
 auth_source: auto
 conditional_groups:
   RedHat: "'RHEL' in image.offer"
@@ -8,3 +9,4 @@ conditional_groups:
 
 #keyed_groups:
 # - key: tags.applicationRole
+...
