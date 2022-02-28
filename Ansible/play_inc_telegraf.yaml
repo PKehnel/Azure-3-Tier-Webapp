@@ -50,7 +50,7 @@
 # Install cpu:mem:nginx telegraf, remove optional TLS config and host verification
 - name: Generate Telegraf config
   become_user: "{{ ansible_user }}"
-  command: telegraf --input-filter cpu:mem:nginx --output-filter azure_monitor config | sudo egrep -v "tls_|insecure_skip_verify" | sudo tee /etc/telegraf/telegraf.conf >/dev/null
+  command: telegraf --input-filter cpu:mem:nginx --output-filter azure_monitor config | sudo egrep -v "tls_|insecure_skip_verify" | sudo tee /etc/telegraf/telegraf.conf # >/dev/null
 
 - name: Add config snippet into nginx configuration file
   become: yes
