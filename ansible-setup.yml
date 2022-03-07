@@ -13,9 +13,7 @@ variables:
   value: prod
 
 pool:
-  name: cas3-$(env)-ansible
-
-
+  name: case3-$(env)-ansible
 
 steps:
   - task: ms-vscs-rm.vss-services-ansible.ansible-task.Ansible@0
