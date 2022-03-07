@@ -1,5 +1,4 @@
 #!/bin/bash
-#userHome="/home/case3-dev-ansible-admin"
 userHome="/root/"
 
 sudo yum update -y

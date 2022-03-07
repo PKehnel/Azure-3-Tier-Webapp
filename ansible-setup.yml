@@ -8,8 +8,14 @@ trigger:
 
 pr: none # Disable pull request triggers.
 
+variables:
+- name: env
+  value: prod
+
 pool:
-  name: Ansible
+  name: cas3-$(env)-ansible
+
+
 
 steps:
   - task: ms-vscs-rm.vss-services-ansible.ansible-task.Ansible@0

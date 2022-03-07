@@ -26,17 +26,17 @@ jobs:
         displayName: 'Terraform : Init'
         inputs:
           provider: 'azurerm'
-          workingDirectory: '$(System.DefaultWorkingDirectory)\Terraform\envs\dev'
+          workingDirectory: '$(System.DefaultWorkingDirectory)\Terraform\envs\$(env)'
           backendServiceArm: SC4TF
           backendAzureRmResourceGroupName: 'rg-uit-tfstate'
           backendAzureRmStorageAccountName: 'stgaccuittfstate'
           backendAzureRmContainerName: 'stgcont-uit-tfstate'
-          backendAzureRmKey: tf-uc3-dev.tfstate
+          backendAzureRmKey: tf-uc3-$(env).tfstate
 
       - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
         displayName: 'Terraform : Destroy'
         inputs:
           command: destroy
-          workingDirectory: '$(System.DefaultWorkingDirectory)\Terraform\envs\dev'
+          workingDirectory: '$(System.DefaultWorkingDirectory)\Terraform\envs\$(env)'
           environmentServiceNameAzureRM: SC4TF
 
