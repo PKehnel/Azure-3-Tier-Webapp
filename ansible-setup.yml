@@ -14,12 +14,12 @@ parameters:
   type: string
   default: dev
   values:
-    - dev
-    - test
-    - prod
+  - dev
+  - test
+  - prod
 
 pool:
-  name: "case3-${{parameters.stage}}-ansible"
+  name: case3-${{parameters.stage}}-ansible
 
 steps:
   - task: ms-vscs-rm.vss-services-ansible.ansible-task.Ansible@0
