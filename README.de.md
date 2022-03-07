@@ -18,8 +18,8 @@ Terraform Module zum Provisionieren einer IaaS in MS Azure
 ### Benutzung
 
 - Pushing zum "main" Branch nur aus Dev
-- wechsele zum [dev](Terraform/stage/dev) oder [prod](Terraform/stage/prod) environment
-- Konfiguriere den "main" Branch nach dem Anforderungen oder Benutze diese Confif um den oben abgebildeten UseCase zu provisionieren
+- Wechsele zur [dev](Terraform/stage/dev) oder [prod](Terraform/stage/prod) Umgebung
+- Konfiguriere den "main" Branch basierend auf den konkreten Anforderungen oder benutze diese Config, um den oben abgebildeten UseCase zu provisionieren
 - Führe die Terraform Kommandos aus:
   - `terraform init`
   - `terraform plan`
