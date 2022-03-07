@@ -9,18 +9,18 @@ trigger:
 pr: none # Disable pull request triggers.
 
 parameters:
-- name: stage
-  displayName: Stage
-  type: string
-  default: dev
-  values:
-  - dev
-  - test
-  - prod
+  - name: stage
+    displayName: Stage
+    type: string
+    default: dev
+    values:
+      - dev
+      - test
+      - prod
 
 variables:
-- name: stage
-  value: ${{parameters.stage}}
+  - name: stage
+    value: ${{parameters.stage}}
 
 pool:
   name: case3-$(stage)-ansible
