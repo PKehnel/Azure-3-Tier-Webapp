@@ -1,12 +1,7 @@
 plugin: azure_rm
 include_vm_resource_groups:
-  - rg-uit-case3-{{stage}}
+  - rg-uit-case3-prod
 auth_source: auto
 conditional_groups:
   RedHat: "'RHEL' in image.offer"
   Ubuntu: "'UbuntuServer' in image.offer"
-keyed_groups:
-# places each host in a group named 'tag_(tag name)_(tag value)' for each tag on a VM.
-- prefix: tag
-  key: tags
-use_extra_vars: true

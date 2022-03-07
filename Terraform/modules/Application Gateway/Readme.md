@@ -17,16 +17,6 @@ IP address and port, to a destination IP address and port.
 - easily integrate WAF
 - 80 / 443 ag perfect
 
-### Localhost vs Hosted:
-
-We decided to use an Ansible host instead of running the playbooks locally. There are some advantages of running the
-playbooks local:
-
-- less complexity
-- no central point with access to all machines (security)
-
-But for a production environment with multiple stages and a infrastructure layer an Ansible host allows managing all
-servers. This is critically for extreme situations like Log4j.
 
 ### Notes:
 
