@@ -1,6 +1,8 @@
 plugin: azure_rm
+vars_files:
+    - vars.yaml
 include_vm_resource_groups:
-  - rg-uit-case3-prod
+  - rg-uit-case3-{{stage}}
 auth_source: auto
 conditional_groups:
   RedHat: "'RHEL' in image.offer"
