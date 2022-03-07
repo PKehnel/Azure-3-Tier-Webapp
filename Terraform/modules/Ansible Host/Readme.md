@@ -24,7 +24,8 @@ playbooks local:
 But for a production environment with multiple stages and a infrastructure layer an Ansible host allows managing all
 servers. This is critically for extreme situations like Log4j.
 
-
 ### Notes:
 
 - the current implementation doesn't allow scaling.
+- as for all infrastructure keys are generated and stored with the Keyvault module 
+
