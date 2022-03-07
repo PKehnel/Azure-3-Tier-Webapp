@@ -13,6 +13,19 @@ The ansible script executes following steps:
 - store private ssh key
 - install azure agent
 
+### Localhost vs Hosted:
+
+We decided to use an Ansible host instead of running the playbooks locally. There are some advantages of running the
+playbooks local:
+
+- less complexity
+- no central point with access to all machines (security)
+
+But for a production environment with multiple stages and a infrastructure layer an Ansible host allows managing all
+servers. This is critically for extreme situations like Log4j.
+
 ### Notes:
 
 - the current implementation doesn't allow scaling.
+- as for all infrastructure keys are generated and stored with the Keyvault module 
+
