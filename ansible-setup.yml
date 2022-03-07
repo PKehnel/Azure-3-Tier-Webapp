@@ -19,7 +19,7 @@ parameters:
     - prod
 
 pool:
-  name: case3-${{parameters.stage}}-ansible
+  name: "case3-${{parameters.stage}}-ansible"
 
 steps:
   - task: ms-vscs-rm.vss-services-ansible.ansible-task.Ansible@0
