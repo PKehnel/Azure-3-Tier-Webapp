@@ -29,6 +29,7 @@ data "template_file" "init_script" {
     tenant          = data.azurerm_key_vault_secret.azure_credentials_tenant.value
     pat_token       = data.azurerm_key_vault_secret.Devops_PAT.value
     userName        = "${local.naming_prefix}-${var.virtual_server_name}-admin"
+    naming_prefix = local.naming_prefix
   }
 }
 
