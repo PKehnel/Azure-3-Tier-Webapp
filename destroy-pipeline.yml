@@ -14,14 +14,14 @@ pool:
   #replace with
 
 parameters:
-- name: stage
-  displayName: Stage
-  type: string
-  default: dev
-  values:
-  - dev
-  - test
-  - prod
+  - name: stage
+    displayName: Stage
+    type: string
+    default: dev
+    values:
+      - dev
+      - test
+      - prod
 
 jobs:
   - job: UseCase3

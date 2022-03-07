@@ -22,13 +22,13 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
-- setup Github actions for Code formatting and security topics (super-linter and tfsec)
+- setup GitHub actions for Code formatting and security topics (super-linter and tfsec)
 - Added readme to all tf modules, ansible and biceps
 - added a Readme.md to all modules giving a brief overview
 - pipelines in a state that they run out of the box on a new account
 
 ## [1.1.5] TODO
 
-- improving overall security by following the Securtiy Principle least privilege for Keyvault, Service Principals, ...
+- improving overall security by following the Security Principle least privilege for Keyvault, Service Principals, ...
   - network security groups vs application security groups
   - Network (whitelist, private endpoint only, network segregation)
