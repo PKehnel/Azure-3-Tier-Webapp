@@ -1,5 +1,6 @@
 plugin: azure_rm
-stage: "dev"
+vars:
+  stage: "dev"
 include_vm_resource_groups:
   - rg-uit-case3-{{stage}}
 auth_source: auto
