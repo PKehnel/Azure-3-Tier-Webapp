@@ -8,12 +8,18 @@ trigger:
 
 pr: none # Disable pull request triggers.
 
-variables:
+parameters:
 - name: env
-  value: prod
+  displayName: Stage
+  type: string
+  default: dev
+  values:
+  - dev
+  - test
+  - prod
 
 pool:
-  name: case3-$(env)-ansible
+  name: case3-${{parameters.stage}}-ansible
 
 steps:
   - task: ms-vscs-rm.vss-services-ansible.ansible-task.Ansible@0
