@@ -13,7 +13,7 @@ pool:
   #name: Default
 
 parameters:
-- name: env
+- name: stage
   displayName: Stage
   type: string
   default: dev

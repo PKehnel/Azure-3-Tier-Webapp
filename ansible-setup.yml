@@ -9,7 +9,7 @@ trigger:
 pr: none # Disable pull request triggers.
 
 parameters:
-- name: env
+- name: stage
   displayName: Stage
   type: string
   default: dev
