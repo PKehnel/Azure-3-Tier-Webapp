@@ -3,7 +3,7 @@ user_list:
   - ansible
 
 env: "case3"
-stage: "prod"
+stage: {{stage}}
 ansible_user: "{{env}}-{{stage}}-webserver-admin"
 ansible_ssh_private_key_file: ~/.ssh/private_key.pem
 
