@@ -9,4 +9,4 @@ keyed_groups:
 # places each host in a group named 'tag_(tag name)_(tag value)' for each tag on a VM.
 - prefix: tag
   key: tags
-use_extra_vars: yes
+use_extra_vars: true
