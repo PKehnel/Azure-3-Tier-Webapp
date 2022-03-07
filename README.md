@@ -14,7 +14,9 @@ Terraform Module to provision IaaS in MS Azure
 
 ## Documentation
 
-### Manual usage:
+### Basic usage
+
+- pushing to main only from Dev
 - go the [dev](Terraform/stage/dev) or [prod](Terraform/stage/prod) environment
 - configure the main to your preference or use the standard config matching the above displayed use case
 - run terraform commands:
@@ -22,13 +24,8 @@ Terraform Module to provision IaaS in MS Azure
   - `terraform plan`
   - `terraform apply`
 
-### Automation
 - when running the project with remote state file, configure via azure.conf and provider.tf
-- pipeline can be imported and started directly via Azure Devops
-- Run `inital_setup.yml` first to setup TF state file and a keyvault. Add the Service Principal credentials to the keyvault (required for Ansible)
-- Next run `build-pipeline.yml` for the Terraform infrastructure and finally `ansible-setup.yml` for the Nginx Setup via Ansible.
-- Destroy all with the `destory-pipeline.yml`
+- for pipeline usage see the [Documentation Folder](/Documentation).
 
-For complete Documentation also see the [Documentation Folder](/Documentation). 
-Also each module has its own markdown file, containing basic information.
+For complete Documentation also see the [Documentation Folder](/Documentation).
 
