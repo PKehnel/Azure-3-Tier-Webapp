@@ -6,11 +6,22 @@
 trigger:
   - none
 
+pr: none # Disable pull request triggers.
+
 pool:
   vmImage: windows-latest
   #name: Default
   #replace with
 
+parameters:
+  - name: stage
+    displayName: Stage
+    type: string
+    default: dev
+    values:
+      - dev
+      - test
+      - prod
 
 jobs:
   - job: UseCase3
@@ -24,17 +35,17 @@ jobs:
         displayName: 'Terraform : Init'
         inputs:
           provider: 'azurerm'
-          workingDirectory: '$(System.DefaultWorkingDirectory)\Terraform\envs\dev'
+          workingDirectory: '$(System.DefaultWorkingDirectory)\Terraform\stage\${{parameters.stage}}'
           backendServiceArm: SC4TF
           backendAzureRmResourceGroupName: 'rg-uit-tfstate'
           backendAzureRmStorageAccountName: 'stgaccuittfstate'
           backendAzureRmContainerName: 'stgcont-uit-tfstate'
-          backendAzureRmKey: tf-uc3-test.tfstate
+          backendAzureRmKey: tf-uc3-${{parameters.stage}}.tfstate
 
       - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
         displayName: 'Terraform : Destroy'
         inputs:
           command: destroy
-          workingDirectory: '$(System.DefaultWorkingDirectory)\Terraform\envs\dev'
+          workingDirectory: '$(System.DefaultWorkingDirectory)\Terraform\stage\${{parameters.stage}}'
           environmentServiceNameAzureRM: SC4TF
 

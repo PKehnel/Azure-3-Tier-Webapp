@@ -23,12 +23,13 @@ data "template_file" "init_script" {
   template = file("${path.module}/${var.script}")
   vars     = {
     ssh_private_key = data.azurerm_key_vault_secret.private_ssh_key.value
-    secret          = data.azurerm_key_vault_secret.azure_credentials_secret
-    subscription_id = data.azurerm_key_vault_secret.azure_credentials_subscription_id
-    client_id       = data.azurerm_key_vault_secret.azure_credentials_client_id
-    tenant          = data.azurerm_key_vault_secret.azure_credentials_tenant
-    pat_token       = data.azurerm_key_vault_secret.Devops_PAT
+    secret          = data.azurerm_key_vault_secret.azure_credentials_secret.value
+    subscription_id = data.azurerm_key_vault_secret.azure_credentials_subscription_id.value
+    client_id       = data.azurerm_key_vault_secret.azure_credentials_client_id.value
+    tenant          = data.azurerm_key_vault_secret.azure_credentials_tenant.value
+    pat_token       = data.azurerm_key_vault_secret.Devops_PAT.value
     userName        = "${local.naming_prefix}-${var.virtual_server_name}-admin"
+    naming_prefix = local.naming_prefix
   }
 }
 

@@ -4,17 +4,28 @@
 # https://aka.ms/yaml
 
 trigger:
-- none
-- #PipelineWorking
+  - none
+
+pr: none # Disable pull request triggers.
+
+parameters:
+  - name: stage
+    displayName: Stage
+    type: string
+    default: dev
+    values:
+      - dev
+      - test
+      - prod
 
 pool:
-  name: Ansible
+  name: case3-${{parameters.stage}}-ansible
 
 steps:
-- task: ms-vscs-rm.vss-services-ansible.ansible-task.Ansible@0
-  displayName: 'Run playbook'
-  inputs:
-    playbookPathOnAgentMachine: '$(System.DefaultWorkingDirectory)/Ansible/playbook.yaml'
-    failOnStdErr: false
-    inventoriesAgentMachine: file
-    inventoryFileOnAgentMachine: '$(System.DefaultWorkingDirectory)/Ansible/inventory_azure_rm.yaml'
+  - task: ms-vscs-rm.vss-services-ansible.ansible-task.Ansible@0
+    displayName: 'Run playbook'
+    inputs:
+      playbookPathOnAgentMachine: '$(System.DefaultWorkingDirectory)/Ansible/playbook.yaml'
+      failOnStdErr: false
+      inventoriesAgentMachine: file
+      inventoryFileOnAgentMachine: '$(System.DefaultWorkingDirectory)/Ansible/inventory_azure_rm.yaml'
