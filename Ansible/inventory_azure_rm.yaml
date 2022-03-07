@@ -1,3 +1,5 @@
+vars:
+  stage: "dev"
 plugin: azure_rm
 include_vm_resource_groups:
   - rg-uit-case3-{{stage}}
