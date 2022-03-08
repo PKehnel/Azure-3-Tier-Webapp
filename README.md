@@ -1,8 +1,9 @@
+#### Eine deutsche Version der Seite findet sich immer auf den entsprechenden [README.de.md](README.de.md) Seiten 
+
 # Use Case 3 Three Tier Webapp
 
-[![Lint Code Base](https://github.kyndryl.net/Cloud-Germany/UIT-3-Tier-Webapp/actions/workflows/linter.yml/badge.svg)](https://github.kyndryl.net/Cloud-Germany/UIT-3-Tier-Webapp/actions/workflows/linter.yml)
-[![tfsec-pr-commenter](https://github.kyndryl.net/Cloud-Germany/UIT-3-Tier-Webapp/actions/workflows/tfsec_pr_commenter.yml/badge.svg)](https://github.kyndryl.net/Cloud-Germany/UIT-3-Tier-Webapp/actions/workflows/tfsec_pr_commenter.yml)
-
+[![Lint Code Base](https://github.com/PKehnel/Azure-3-Tier-Webapp/actions/workflows/linter.yml/badge.svg)](https://github.com/PKehnel/Azure-3-Tier-Webapp/actions/workflows/linter.yml)
+[![tfsec-pr-commenter](https://github.com/PKehnel/Azure-3-Tier-Webapp/actions/workflows/tfsec_pr_commenter.yml/badge.svg)](https://github.com/PKehnel/Azure-3-Tier-Webapp/actions/workflows/tfsec_pr_commenter.yml)
 ![Terraform](https://img.shields.io/badge/terraform-%235835CC.svg?style=for-the-badge&logo=terraform&logoColor=white)
 
 Terraform Module to provision IaaS in MS Azure
