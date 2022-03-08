@@ -21,8 +21,6 @@ parameters:
 stages:
   - stage: Terraform
     displayName: Provisioning Infrastructure (Setup Terraform)
-    dependsOn: string | [ string ]
-    condition: string
     pool:
       vmImage: windows-latest
     jobs:
