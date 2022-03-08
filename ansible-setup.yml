@@ -22,15 +22,18 @@ variables:
   - name: stage
     value: ${{parameters.stage}}
 
-pool:
-  name: case3-$(stage)-ansible
 
-steps:
-  - task: ms-vscs-rm.vss-services-ansible.ansible-task.Ansible@0
-    displayName: 'Run playbook'
-    inputs:
-      playbookPathOnAgentMachine: '$(System.DefaultWorkingDirectory)/Ansible/playbook.yaml'
-      failOnStdErr: false
-      inventoriesAgentMachine: file
-      inventoryFileOnAgentMachine: '$(System.DefaultWorkingDirectory)/Ansible/inventory_azure_rm.yaml'
-      args: '--extra-vars "stage=$(stage)"'
+jobs:
+  - job: Ansible
+    pool:
+      name: case3-${{parameters.stage}}-ansible
+    displayName: 'Run Ansible Playbook'
+    steps:
+      - task: ms-vscs-rm.vss-services-ansible.ansible-task.Ansible@0
+        displayName: 'Run playbook'
+        inputs:
+          playbookPathOnAgentMachine: '$(System.DefaultWorkingDirectory)/Ansible/playbook.yaml'
+          failOnStdErr: false
+          inventoriesAgentMachine: file
+          inventoryFileOnAgentMachine: '$(System.DefaultWorkingDirectory)/Ansible/inventory_azure_rm.yaml'
+          args: '--extra-vars "stage=$(stage)"'
