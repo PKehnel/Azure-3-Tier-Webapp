@@ -45,7 +45,6 @@ jobs:
         displayName: 'Terraform : Plan'
         inputs:
           command: plan
-          provider: 'azurerm'
           workingDirectory: '$(System.DefaultWorkingDirectory)\Terraform\stage\${{parameters.stage}}'
           environmentServiceNameAzureRM: SC4TF
 
@@ -53,6 +52,5 @@ jobs:
         displayName: 'Terraform : Apply'
         inputs:
           command: apply
-          provider: 'azurerm'
           workingDirectory: '$(System.DefaultWorkingDirectory)\Terraform\stage\${{parameters.stage}}'
           environmentServiceNameAzureRM: SC4TF
