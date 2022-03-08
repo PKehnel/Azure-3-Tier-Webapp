@@ -1,7 +1,6 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+# TF and Ansible Setup
+# Stage 1: TF init, plan, apply
+# Stage 2: Ansible Playbook, if stage 1 was successful
 
 trigger:
   - none
