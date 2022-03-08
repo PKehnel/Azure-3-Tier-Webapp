@@ -1,6 +1,6 @@
 ---
 - name: Usecase 3
-  hosts: Ubuntu
+  hosts: tag_webserver_{{stage}}
 
   become: yes
   vars_files:
