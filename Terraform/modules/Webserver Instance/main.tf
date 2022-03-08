@@ -76,8 +76,10 @@ resource "azurerm_virtual_machine" "virtual_servers" {
   identity {
     type = "SystemAssigned"
   }
-  tags = var.standard_tags
+  tags = merge(var.standard_tags,
+  { webserver = var.stage }, )
 }
+
 
 # Create FrontEnd NICs for the webservers in the web subnet
 resource "azurerm_network_interface" "nic" {
