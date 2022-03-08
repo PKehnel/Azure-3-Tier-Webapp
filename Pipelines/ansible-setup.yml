@@ -18,11 +18,6 @@ parameters:
       - test
       - prod
 
-variables:
-  - name: stage
-    value: ${{parameters.stage}}
-
-
 jobs:
   - job: Ansible
     pool:
