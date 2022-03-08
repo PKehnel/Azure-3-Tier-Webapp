@@ -54,4 +54,3 @@ jobs:
           command: apply
           workingDirectory: '$(System.DefaultWorkingDirectory)\Terraform\stage\${{parameters.stage}}'
           environmentServiceNameAzureRM: SC4TF
-      
