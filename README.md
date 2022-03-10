@@ -1,5 +1,3 @@
-#### Eine deutsche Version der Seite findet sich immer auf den entsprechenden [README.de.md](README.de.md) Seiten 
-
 # Use Case 3 Three Tier Webapp
 
 [![Lint Code Base](https://github.com/PKehnel/Azure-3-Tier-Webapp/actions/workflows/linter.yml/badge.svg)](https://github.com/PKehnel/Azure-3-Tier-Webapp/actions/workflows/linter.yml)
