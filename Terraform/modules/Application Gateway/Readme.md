@@ -15,11 +15,5 @@ IP address and port, to a destination IP address and port.
 **Advantage of Application gateway:**
 
 - easily integrate WAF
-- 80 / 443 ag perfect
-
-### Notes:
-
-- the current implementation doesn't allow scaling.
-- as for all infrastructure keys are generated and stored with the Keyvault module
 - 80 / 443 AppGw perfect
 - SSL Offload Capability
