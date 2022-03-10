@@ -39,12 +39,12 @@ jobs:
           backendAzureRmContainerName: 'stgcont-uit-tfstate'
           backendAzureRmKey: tf-uc3-${{parameters.stage}}.tfstate
 
-      - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
-        displayName: 'Terraform : Plan'
-        inputs:
-          command: plan
-          workingDirectory: '$(System.DefaultWorkingDirectory)\Terraform\stage\${{parameters.stage}}'
-          environmentServiceNameAzureRM: SC4TF
+#      - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
+#        displayName: 'Terraform : Plan'
+#        inputs:
+#          command: plan
+#          workingDirectory: '$(System.DefaultWorkingDirectory)\Terraform\stage\${{parameters.stage}}'
+#          environmentServiceNameAzureRM: SC4TF
 
       - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
         displayName: 'Terraform : Apply'
