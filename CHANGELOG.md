@@ -27,8 +27,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - added a Readme.md to all modules giving a brief overview
 - pipelines in a state that they run out of the box on a new account
 
-## [1.1.5] TODO
+## [1.2.0] - 2022-02-28
 
-- improving overall security by following the Security Principle least privilege for Keyvault, Service Principals, ...
-  - network security groups vs application security groups
-  - Network (whitelist, private endpoint only, network segregation)
+### Pipeline Staging + End to End automation done
+
+- Staging parameters (Prod / Dev / Test) can be selected in all Pipelines
+- Ansible selects hosts via tag (webserver: {{stage}})
+- German Documentation is added to all modules.
