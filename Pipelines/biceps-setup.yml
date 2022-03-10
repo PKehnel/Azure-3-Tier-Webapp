@@ -1,3 +1,6 @@
+# Initial Setup
+# Biceps, setup storage for tf and keyvault
+
 trigger:
   - none
 pr: none # Disable pull request triggers.

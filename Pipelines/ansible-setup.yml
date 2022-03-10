@@ -1,0 +1,33 @@
+# Configuration Management
+# Ansible Playbook, setting up the nginx hosts and some basic config
+# stage via extra vars
+
+trigger:
+  - none
+
+pr: none # Disable pull request triggers.
+
+parameters:
+  - name: stage
+    displayName: Stage
+    type: string
+    default: dev
+    values:
+      - dev
+      - test
+      - prod
+
+jobs:
+  - job: Ansible
+    pool:
+      name: case3-${{parameters.stage}}-ansible
+    displayName: 'Run Ansible Playbook'
+    steps:
+      - task: ms-vscs-rm.vss-services-ansible.ansible-task.Ansible@0
+        displayName: 'Run playbook'
+        inputs:
+          playbookPathOnAgentMachine: '$(System.DefaultWorkingDirectory)/Ansible/playbook.yaml'
+          failOnStdErr: false
+          inventoriesAgentMachine: file
+          inventoryFileOnAgentMachine: '$(System.DefaultWorkingDirectory)/Ansible/inventory_azure_rm.yaml'
+          args: '--extra-vars "stage=$(stage)"'
