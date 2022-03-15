@@ -5,7 +5,7 @@
 trigger:
   - none
 
-pr: none # Disable pull request triggers.
+#pr: none # Disable pull request triggers.
 
 parameters:
   - name: stage
