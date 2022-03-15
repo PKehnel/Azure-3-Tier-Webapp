@@ -14,7 +14,7 @@ variables:
   stgAccountRgName: 'rg-uit-tfstate'
   stgAccountName: 'stgaccuittfstate'
   stgAccountContainerName: 'stgcont-uit-tfstate'
-  vaultName: 'key-vault-uit-case3'
+  vaultName: 'key-vault-uit-demo'
 
 pool:
   vmImage: windows-latest
