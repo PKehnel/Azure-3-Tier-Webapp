@@ -163,7 +163,7 @@ resource "azurerm_virtual_machine_extension" "startup" {
 # Pull existing Key Vault from Azure
 
 data "azurerm_key_vault" "infra-vault" {
-  name                = "key-vault-uit-case3"
+  name                = "key-vault-uit-demo"
   resource_group_name = "rg-uit-tfstate"
 }
 

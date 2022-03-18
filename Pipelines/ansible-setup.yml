@@ -5,7 +5,7 @@
 trigger:
   - none
 
-pr: none # Disable pull request triggers.
+#pr: none # Disable pull request triggers.
 
 parameters:
   - name: stage
@@ -30,4 +30,4 @@ jobs:
           failOnStdErr: false
           inventoriesAgentMachine: file
           inventoryFileOnAgentMachine: '$(System.DefaultWorkingDirectory)/Ansible/inventory_azure_rm.yaml'
-          args: '--extra-vars "stage=$(stage)"'
+          args: '--extra-vars "stage=${{parameters.stage}}"'
